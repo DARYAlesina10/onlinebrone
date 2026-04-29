@@ -898,12 +898,18 @@ get_header();
   <script src="<?php bloginfo('template_directory'); ?>/js/jquery.min.js"></script>
 
 <style>
-.container-xl{max-width:1240px}.footer__inner.vz{background:linear-gradient(180deg,#fff 0%,#f7fbff 100%);border:1px solid #dbe8f4;border-radius:18px;padding:18px 14px;margin-bottom:18px;box-shadow:0 8px 22px rgba(20,55,90,.06)}
-.main__title.quest-selection-page__title{font-weight:800;color:#1f3650;letter-spacing:.2px}
-.booking-popup__legend{background:#eef7ff;border:1px solid #d6eaff;padding:10px 14px;border-radius:12px;color:#3c5974}
-.vramecko{border-radius:14px!important;box-shadow:0 6px 16px rgba(0,0,0,.08)}
-.animated-button.button{border-radius:12px!important}
-.vibmn{background:#f2fbf4;border:1px solid #d6f0dd;padding:10px;border-radius:12px}
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap");
+body{font-family:Montserrat,Helvetica,Arial,sans-serif;background:#f5f7fb}
+.container-xl{max-width:1240px}
+.footer__inner.vz{background:#fff;border:1px solid #dce6f2;border-radius:22px;padding:20px 16px;margin-bottom:20px;box-shadow:0 12px 30px rgba(16,56,88,.08)}
+.main__title.quest-selection-page__title{font-weight:800;color:#1d2f45;text-transform:uppercase;letter-spacing:.4px}
+.booking-popup__legend{background:#f2f7ff;border:1px solid #dbe8ff;padding:12px 14px;border-radius:14px;color:#48627e}
+.vramecko{border-radius:16px!important;box-shadow:0 8px 22px rgba(0,0,0,.1)}
+.animated-button.button,.button.button--orange,.vbnr{border-radius:14px!important;background:#a4d013!important;border-color:#a4d013!important;color:#fff!important;font-weight:700}
+.animated-button.button:hover,.button.button--orange:hover,.vbnr:hover{background:#8db61b!important;border-color:#8db61b!important}
+.nav-pills .nav-link{background:#e9f0db;color:#3d4f1a;border-radius:12px}
+.nav-pills .nav-link.active,.nav-pills .show>.nav-link{background:#ffbd3c;color:#fff}
+.vibmn{background:#eff9e8;border:1px solid #d6efc6;padding:10px;border-radius:12px}
 #iton .table{background:#fff;border-radius:12px;overflow:hidden}
 </style>
 <script src="https://pandoroom.org/wp-content/themes/pandoroom/js/jquery.maskedinput.min.js"></script>
