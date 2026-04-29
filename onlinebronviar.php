@@ -426,10 +426,10 @@ get_header();
     <div class="col-md-10">
       <h3 class="main__title quest-selection-page__title">Пакетное предложение</h3>
       <legend class="booking-popup__legend">Шаг 2: выберите пакет. После выбора откроется выбор банкетной комнаты.</legend>
-      <div class="row g-3 paket-grid">
-        <div class="col-md-4"><div class="paket-card" data-paket="Пакет Мини" data-weekday8="16000" data-weekday16="22000" data-weekday20="26000" data-weekend8="22000" data-weekend16="28000" data-weekend20="32000"><h4>Пакет Мини</h4><p>2 часа комнаты + 50 минут игры</p><button class="animated-button button paket-select">Выбрать пакет</button></div></div>
-        <div class="col-md-4"><div class="paket-card" data-paket="Пакет Стандарт" data-weekday8="20000" data-weekday16="26000" data-weekday20="30000" data-weekend8="30000" data-weekend16="36000" data-weekend20="40000"><h4>Пакет Стандарт</h4><p>3 часа комнаты + 1:50 игры</p><button class="animated-button button paket-select">Выбрать пакет</button></div></div>
-        <div class="col-md-4"><div class="paket-card" data-paket="Пакет Макс" data-weekday8="26000" data-weekday16="32000" data-weekday20="36000" data-weekend8="36000" data-weekend16="42000" data-weekend20="46000"><h4>Пакет Макс</h4><p>4 часа комнаты + 2:50 игры</p><button class="animated-button button paket-select">Выбрать пакет</button></div></div>
+      <div class="row g-3 paket-grid home-page__gallery">
+        <div class="col-md-4"><div class="paket-card gallery-card" data-paket="Пакет Мини" data-weekday8="16000" data-weekday16="22000" data-weekday20="26000" data-weekend8="22000" data-weekend16="28000" data-weekend20="32000"><h4>Пакет Мини</h4><p>2 часа комнаты + 50 минут игры</p><button class="animated-button button paket-select">Выбрать пакет</button></div></div>
+        <div class="col-md-4"><div class="paket-card gallery-card" data-paket="Пакет Стандарт" data-weekday8="20000" data-weekday16="26000" data-weekday20="30000" data-weekend8="30000" data-weekend16="36000" data-weekend20="40000"><h4>Пакет Стандарт</h4><p>3 часа комнаты + 1:50 игры</p><button class="animated-button button paket-select">Выбрать пакет</button></div></div>
+        <div class="col-md-4"><div class="paket-card gallery-card" data-paket="Пакет Макс" data-weekday8="26000" data-weekday16="32000" data-weekday20="36000" data-weekend8="36000" data-weekend16="42000" data-weekend20="46000"><h4>Пакет Макс</h4><p>4 часа комнаты + 2:50 игры</p><button class="animated-button button paket-select">Выбрать пакет</button></div></div>
       </div>
     </div>
   </div>
@@ -908,7 +908,7 @@ get_header();
     });
   </script>
   <script src="<?php bloginfo('template_directory'); ?>/js/jquery.min.js"></script>
-<style>.paket-card{background:#fff;border:1px solid #e5e5e5;border-radius:14px;padding:18px;height:100%}.paket-card h4{color:#000;font-size:24px}.paket-card p{color:#333;min-height:44px}.paket-card.active{border-color:#99c31c;box-shadow:0 0 0 2px #99c31c33}</style>
+<style>.paket-grid .col-md-4{display:flex}.paket-card{background:linear-gradient(180deg,#ffffff 0%,#f6fbff 100%);border:1px solid #d7e7f5;border-radius:22px;padding:24px;height:100%;width:100%;box-shadow:0 12px 30px rgba(30,72,107,.08)}.paket-card h4{color:#1c2f41;font-size:28px;font-weight:700;margin-bottom:8px}.paket-card p{color:#4e667d;min-height:44px;margin-bottom:18px}.paket-card .button{background:#15cef3;border:none}.paket-card.active{border-color:#15cef3;box-shadow:0 0 0 3px #15cef344,0 12px 30px rgba(30,72,107,.12)}</style>
 <script src="https://pandoroom.org/wp-content/themes/pandoroom/js/jquery.maskedinput.min.js"></script>
 <script defer src="<?php bloginfo('template_directory'); ?>/scriptsz/scriptviar.js?v=<?php echo time(); ?>"></script>
   <script  src="<?php bloginfo('template_directory'); ?>/jss/standart.js"></script>

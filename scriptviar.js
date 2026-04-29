@@ -438,7 +438,6 @@ $(document).on('click', '#dtolvibx', function(e){
 
         $('#vibpaket').show(300);
         $('html, body').animate({ scrollTop: $('#vibpaket').offset().top }, 500);
-        return false;
 
         $('.preloader-5').show();
 
@@ -1388,7 +1387,9 @@ $(document).on('click', '.paket-select', function(e){
 
     var totalGuests = (($('#kdet').val()*1)||0) + (($('#kgos').val()*1)||0);
     var dateStr = ($('#dtolvibx').attr('data-dates') || '').trim();
-    var d = new Date(dateStr.split('.').reverse().join('-'));
+    var isoDate = dateStr;
+    if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateStr)) { isoDate = dateStr.split('.').reverse().join('-'); }
+    var d = new Date(isoDate);
     var weekend = (d.getDay() === 0 || d.getDay() === 6);
     var tier = totalGuests <= 8 ? '8' : (totalGuests <= 16 ? '16' : '20');
     var price = $card.data((weekend ? 'weekend' : 'weekday') + tier) || 0;
