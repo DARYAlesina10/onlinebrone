@@ -366,6 +366,7 @@ $("#kvestvib").click(function(e){
 // --- Глобальные переменные (держи их 1 раз на странице) ---
 var currentStolRequest = null;
 var stolReqToken = 0;
+var selectedPackage = null;
 
 $(document).on('click', '#dtolvibx', function(e){
 
@@ -434,6 +435,10 @@ $(document).on('click', '#dtolvibx', function(e){
 
     // ✅ возраст убрали из условия
     if (vrem!=='' && datrNorm!=='' && kvz!=='' && kdet!=='') {
+
+        $('#vibpaket').show(300);
+        $('html, body').animate({ scrollTop: $('#vibpaket').offset().top }, 500);
+        return false;
 
         $('.preloader-5').show();
 
@@ -1374,6 +1379,27 @@ $(document).on('click','.zapry', function(){
 
 
 
+
+$(document).on('click', '.paket-select', function(e){
+    e.preventDefault();
+    var $card = $(this).closest('.paket-card');
+    $('.paket-card').removeClass('active');
+    $card.addClass('active');
+
+    var totalGuests = (($('#kdet').val()*1)||0) + (($('#kgos').val()*1)||0);
+    var dateStr = ($('#dtolvibx').attr('data-dates') || '').trim();
+    var d = new Date(dateStr.split('.').reverse().join('-'));
+    var weekend = (d.getDay() === 0 || d.getDay() === 6);
+    var tier = totalGuests <= 8 ? '8' : (totalGuests <= 16 ? '16' : '20');
+    var price = $card.data((weekend ? 'weekend' : 'weekday') + tier) || 0;
+
+    selectedPackage = { name: $card.data('paket'), price: price };
+    $('.dobpak').remove();
+    $('#cdv').append("<div class='uls dobpak'><a href='#vibpaket' class='prik'>✔️ "+selectedPackage.name+" — "+price+" руб.</a></div>");
+
+    $('#vibzali').show(500);
+    $('html, body').animate({ scrollTop: $('#vibzali').offset().top }, 500);
+});
 $(document).on('click', '.stolmer', function(){
 
     // ✅ если выбрали стол из "ближайшего времени" — подставляем его время в input#nax
