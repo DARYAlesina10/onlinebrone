@@ -400,7 +400,7 @@ get_header();
                                           <span  class="button button--orange" id="kvestvib" data-start="" data-end="" data-dates=""><img class="button__icon" src="../imgs/Group286.png" alt="">Выбор квеста</span>
                                         </div>
                                         <div class="col-md-6" style="padding-top:20px">
-                                          <span  class="button button--orange" id="dtolvibx" data-start="" data-end="" data-dates="" ><img class="button__icon" src="../imgs/Group286.png" alt=""> + Выбор пакета</span>
+                                          <span  class="button button--orange" id="dtolvibx" data-start="" data-end="" data-dates="" ><img class="button__icon" src="../imgs/Group286.png" alt=""> + Выбор стола</span>
                                         </div>
                                       </div>
 									 </form> 
@@ -420,20 +420,8 @@ get_header();
 		   
      </section>
 
-<section class="container-xl" id="vibpaket" style="display:none;">
-  <div class="row footer__inner vz">
-    <div class="col-md-2 redv"><div class="vramecko" style="border: 7px solid #99c31c;"><img src="http://pandoroom.org/wp-content/uploads/2024/01/bron.png" class="img-fluid" style="padding-left: 8px;padding-top: 8px;"></div></div>
-    <div class="col-md-10">
-      <h3 class="main__title quest-selection-page__title">Пакетное предложение</h3>
-      <legend class="booking-popup__legend">Шаг 2: выберите пакет. После выбора откроется выбор банкетной комнаты.</legend>
-      <div class="row g-3 paket-grid home-page__gallery">
-        <div class="col-md-4"><div class="paket-card gallery-card" data-paket="Пакет Мини" data-weekday8="16000" data-weekday16="22000" data-weekday20="26000" data-weekend8="22000" data-weekend16="28000" data-weekend20="32000"><h4>Пакет Мини</h4><p>2 часа комнаты + 50 минут игры</p><button class="animated-button button paket-select">Выбрать пакет</button></div></div>
-        <div class="col-md-4"><div class="paket-card gallery-card" data-paket="Пакет Стандарт" data-weekday8="20000" data-weekday16="26000" data-weekday20="30000" data-weekend8="30000" data-weekend16="36000" data-weekend20="40000"><h4>Пакет Стандарт</h4><p>3 часа комнаты + 1:50 игры</p><button class="animated-button button paket-select">Выбрать пакет</button></div></div>
-        <div class="col-md-4"><div class="paket-card gallery-card" data-paket="Пакет Макс" data-weekday8="26000" data-weekday16="32000" data-weekday20="36000" data-weekend8="36000" data-weekend16="42000" data-weekend20="46000"><h4>Пакет Макс</h4><p>4 часа комнаты + 2:50 игры</p><button class="animated-button button paket-select">Выбрать пакет</button></div></div>
-      </div>
-    </div>
-  </div>
-</section>
+
+
 
  <section class="container-xl" >
              <div class="row footer__inner vz">
@@ -908,7 +896,16 @@ get_header();
     });
   </script>
   <script src="<?php bloginfo('template_directory'); ?>/js/jquery.min.js"></script>
-<style>.paket-grid .col-md-4{display:flex}.paket-card{background:linear-gradient(180deg,#ffffff 0%,#f6fbff 100%);border:1px solid #d7e7f5;border-radius:22px;padding:24px;height:100%;width:100%;box-shadow:0 12px 30px rgba(30,72,107,.08)}.paket-card h4{color:#1c2f41;font-size:28px;font-weight:700;margin-bottom:8px}.paket-card p{color:#4e667d;min-height:44px;margin-bottom:18px}.paket-card .button{background:#15cef3;border:none}.paket-card.active{border-color:#15cef3;box-shadow:0 0 0 3px #15cef344,0 12px 30px rgba(30,72,107,.12)}</style>
+
+<style>
+.container-xl{max-width:1240px}.footer__inner.vz{background:linear-gradient(180deg,#fff 0%,#f7fbff 100%);border:1px solid #dbe8f4;border-radius:18px;padding:18px 14px;margin-bottom:18px;box-shadow:0 8px 22px rgba(20,55,90,.06)}
+.main__title.quest-selection-page__title{font-weight:800;color:#1f3650;letter-spacing:.2px}
+.booking-popup__legend{background:#eef7ff;border:1px solid #d6eaff;padding:10px 14px;border-radius:12px;color:#3c5974}
+.vramecko{border-radius:14px!important;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+.animated-button.button{border-radius:12px!important}
+.vibmn{background:#f2fbf4;border:1px solid #d6f0dd;padding:10px;border-radius:12px}
+#iton .table{background:#fff;border-radius:12px;overflow:hidden}
+</style>
 <script src="https://pandoroom.org/wp-content/themes/pandoroom/js/jquery.maskedinput.min.js"></script>
 <script defer src="<?php bloginfo('template_directory'); ?>/scriptsz/scriptviar.js?v=<?php echo time(); ?>"></script>
   <script  src="<?php bloginfo('template_directory'); ?>/jss/standart.js"></script>

@@ -366,7 +366,6 @@ $("#kvestvib").click(function(e){
 // --- Глобальные переменные (держи их 1 раз на странице) ---
 var currentStolRequest = null;
 var stolReqToken = 0;
-var selectedPackage = null;
 
 $(document).on('click', '#dtolvibx', function(e){
 
@@ -435,9 +434,6 @@ $(document).on('click', '#dtolvibx', function(e){
 
     // ✅ возраст убрали из условия
     if (vrem!=='' && datrNorm!=='' && kvz!=='' && kdet!=='') {
-
-        $('#vibpaket').show(300);
-        $('html, body').animate({ scrollTop: $('#vibpaket').offset().top }, 500);
 
         $('.preloader-5').show();
 
@@ -1378,29 +1374,6 @@ $(document).on('click','.zapry', function(){
 
 
 
-
-$(document).on('click', '.paket-select', function(e){
-    e.preventDefault();
-    var $card = $(this).closest('.paket-card');
-    $('.paket-card').removeClass('active');
-    $card.addClass('active');
-
-    var totalGuests = (($('#kdet').val()*1)||0) + (($('#kgos').val()*1)||0);
-    var dateStr = ($('#dtolvibx').attr('data-dates') || '').trim();
-    var isoDate = dateStr;
-    if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateStr)) { isoDate = dateStr.split('.').reverse().join('-'); }
-    var d = new Date(isoDate);
-    var weekend = (d.getDay() === 0 || d.getDay() === 6);
-    var tier = totalGuests <= 8 ? '8' : (totalGuests <= 16 ? '16' : '20');
-    var price = $card.data((weekend ? 'weekend' : 'weekday') + tier) || 0;
-
-    selectedPackage = { name: $card.data('paket'), price: price };
-    $('.dobpak').remove();
-    $('#cdv').append("<div class='uls dobpak'><a href='#vibpaket' class='prik'>✔️ "+selectedPackage.name+" — "+price+" руб.</a></div>");
-
-    $('#vibzali').show(500);
-    $('html, body').animate({ scrollTop: $('#vibzali').offset().top }, 500);
-});
 $(document).on('click', '.stolmer', function(){
 
     // ✅ если выбрали стол из "ближайшего времени" — подставляем его время в input#nax
@@ -1975,3 +1948,20 @@ result = regphone.replace(/[^+\d]+/g, "");
 		$('#questPopupbron').show();}
 		
 	});
+
+$(function(){
+  var sections=[
+    ['#vibzali','3. Выбор стола'],
+    ['#vibkv','4. Квест / активности'],
+    ['#dmenu','5. Меню'],
+    ['#ukrvib','6. Украшения'],
+    ['#shvib','7. Шоу'],
+    ['#vibtorts','8. Торт'],
+    ['#iton','9. Подтверждение']
+  ];
+  sections.forEach(function(it){
+    var $el=$(it[0]); if($el.length){
+      if(!$el.find('.step-chip').length){$el.prepend('<div class="step-chip" style="display:inline-block;background:#1fa7d6;color:#fff;padding:6px 12px;border-radius:999px;margin:0 0 10px 0;font-weight:700">'+it[1]+'</div>');}
+    }
+  });
+});
