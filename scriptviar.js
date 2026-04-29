@@ -1965,3 +1965,44 @@ $(function(){
     }
   });
 });
+
+
+function addMinutesHHMM(hhmm, mins){
+  var p=hhmm.split(':'); var d=new Date(2000,0,1,parseInt(p[0],10),parseInt(p[1],10)+mins,0,0);
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
+$(document).on('click','#findslots',function(e){
+  e.preventDefault();
+  var date=$('#datz').val();
+  var pack=($('#paket_hours').val()||'').trim();
+  if(!date || !pack){ alert('Выберите дату и пакет'); return; }
+  var arenaSlotsCount=parseInt(pack,10); // 1/2/3 часа арены
+  var candidates=['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30'];
+  $('#arenaSlots').html('<div class="col-12">Ищем ближайшие слоты...</div>');
+  var found=[];
+  var i=0;
+  function checkNext(){
+    if(i>=candidates.length || found.length>=4){
+      if(!found.length){$('#arenaSlots').html('<div class="col-12" style="color:#c00">Свободных слотов не найдено</div>'); return;}
+      var html='';
+      found.forEach(function(t){ html += '<div class="col-md-3 col-6" style="margin-bottom:8px"><span class="animated-button button slotpick" data-time="'+t+'" style="display:block">'+t+'</span></div>'; });
+      $('#arenaSlots').html(html);
+      return;
+    }
+    var st=candidates[i++]; var stop=addMinutesHHMM(st,arenaSlotsCount*60);
+    $.get('/svstolviar.php',{dat:date,start:st,stop:stop,kol:($('#kdet').val()*1)+($('#kgos').val()*1),voz:0,zal:4,ok:2,t:Date.now()},function(resp){
+      try{ var arr=JSON.parse(resp); if(Array.isArray(arr)&&arr.length){ found.push(st);} }catch(err){}
+      checkNext();
+    }).fail(checkNext);
+  }
+  checkNext();
+});
+
+$(document).on('click','.slotpick',function(){
+  var t=$(this).data('time');
+  $('#nax').val(t);
+  $('#dtolvibx').attr('data-start',t).attr('data-dates',$('#datz').val());
+  $('.slotpick').removeClass('button--orange');
+  $(this).addClass('button--orange');
+});
