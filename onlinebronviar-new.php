@@ -2,6 +2,29 @@
 /*
 Template name: виар онлайн брони NEW
 */
+$foodItems=[];
+$decorItems=[];
+try {
+  $login=json_encode(['apiLogin'=>'3e2a8252692647d9a40bb92e194dd7ea']);
+  $ch=curl_init('https://api-ru.iiko.services/api/1/access_token');
+  curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>1,CURLOPT_POST=>1,CURLOPT_HTTPHEADER=>['Content-Type: application/json'],CURLOPT_POSTFIELDS=>$login]);
+  $tokenResp=json_decode(curl_exec($ch),true); curl_close($ch);
+  if(!empty($tokenResp['token'])){
+    $payload=json_encode(['startRevision'=>1,'organizationId'=>'0d11942d-de93-4be2-ae24-752307cc186b']);
+    $ch=curl_init('https://api-ru.iiko.services/api/1/nomenclature');
+    curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>1,CURLOPT_POST=>1,CURLOPT_HTTPHEADER=>['Content-Type: application/json','Authorization: Bearer '.$tokenResp['token']],CURLOPT_POSTFIELDS=>$payload]);
+    $nom=json_decode(curl_exec($ch),true); curl_close($ch);
+    $foodGroups=['f54fb156-fe31-4824-ba31-fe38b8c6d7cb','33ab134e-2ca1-49d2-b4e6-ee0b8d562871','608c883e-7678-4fa8-9ef1-e127ea8877f2','89ae1b8f-c8b9-4099-be4e-52a233a287a8','767fa1a8-4578-499e-ad5b-a3d0dc6ba11f','bebbdf8e-31e8-4c60-bc46-8da01e6615ac'];
+    $decorGroups=['2f583c03-35f2-455d-b868-9f3b53f06104','7f5314fc-461e-4ff1-9792-91925379350b'];
+    foreach(($nom['products']??[]) as $pr){
+      $price=$pr['sizePrices'][0]['price']['currentPrice']??0;
+      if(in_array($pr['parentGroup']??'', $foodGroups,true)) $foodItems[]=[($pr['name']??'Товар'),(int)$price];
+      if(in_array($pr['parentGroup']??'', $decorGroups,true)) $decorItems[]=[($pr['name']??'Украшение'),(int)$price];
+    }
+  }
+}catch(Throwable $e){}
+if(!$foodItems){$foodItems=[['Сет праздничный',5500],['Напитки',2500],['Торт',4000]];}
+if(!$decorItems){$decorItems=[['Базовое украшение',4500],['Премиум украшение',9000]];}
 get_header();
 ?>
 <section class="vr-booking container-fluid py-4"><div class="container-xxl">
@@ -38,8 +61,8 @@ const PACKAGES=[
 ];
 const state={step:0};
 const games=[['Magic',0],['Zombie Vegas',0],['Party 2',0],['Horror',0],['Tactics',0],['Battle',0],['Zombies',0],['Party Games',0]];
-const decor=[['Базовое украшение',4500],['Премиум украшение',9000]];
-const food=[['Сет праздничный',5500],['Напитки',2500],['Торт',4000]];
+const decor=<?php echo json_encode(array_values($decorItems), JSON_UNESCAPED_UNICODE); ?>;
+const food=<?php echo json_encode(array_values($foodItems), JSON_UNESCAPED_UNICODE); ?>;
 const STEP_TITLES=['Дата и время','Пакет','Стол и арена','Гости','Игры','Украшения и еда','Отправка'];
 function goStep(n){
   state.step=n;
