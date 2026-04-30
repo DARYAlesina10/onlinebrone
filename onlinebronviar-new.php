@@ -11,7 +11,7 @@ get_header();
     <div class="wizard-nav" id="wizardNav"></div>
     <div class="step" data-step="0"><h2>Дата и время праздника</h2><input type="date" id="date"><input type="time" id="time" step="1800"><button id="toStep1">Далее</button></div>
     <div class="step" data-step="1" style="display:none"><h2>Выбор пакета</h2><div id="packages" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="0">Назад</button><button id="findArena">Показать свободные слоты</button></div></div>
-    <div class="step" data-step="2" style="display:none"><h2>Выбор стола и арены</h2><div id="slots"></div><div class="cards" id="tables"><div class="card">VIP 1</div><div class="card">VIP 2</div><div class="card">VIP 3</div></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
+    <div class="step" data-step="2" style="display:none"><h2>Выбор стола и арены</h2><div id="slots"></div><div class="cards" id="tables"></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
     <div class="step" data-step="3" style="display:none"><h2>Данные о гостях</h2><input id="guests" type="number" placeholder="Количество гостей"><input id="kidname" placeholder="Имя именинника"><input id="parent" placeholder="Имя родителя"><div class="step-actions"><button class="ghost prev" data-prev="2">Назад</button><button id="toStep4">Далее</button></div></div><div class="step" data-step="4" style="display:none"><h2>Выбор арены и игры</h2><div id="games" class="cards"></div></div>
     <div class="step" data-step="5" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><h2>Еда</h2><div id="food" class="cards"></div></div>
     <div class="step" data-step="6" style="display:none"><h2>Отправка</h2><input id="phone" placeholder="Телефон"><div class="step-actions"><button class="ghost prev" data-prev="5">Назад</button><button id="sendOrder">Отправить</button></div></div>
@@ -23,7 +23,7 @@ get_header();
 .vr-booking .vr-main{background:#22242b;border:1px solid #353945;padding:28px;border-radius:18px}
 .vr-booking .vr-summary{position:sticky;top:20px;height:fit-content;background:#1f2128;border:1px solid #393d4c;color:#fff;padding:18px;border-radius:16px}
 .vr-booking{display:block}.vr-booking .container-xxl>.vr-summary{float:right;width:340px;margin-left:20px}.vr-booking .container-xxl>.vr-main{overflow:hidden}
-.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{background:#2b2e37;border:1px solid #464b5c;border-radius:14px;padding:14px;cursor:pointer;color:#fff}.card.active{border-color:#9dd41a;box-shadow:0 0 0 2px #9dd41a40}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{background:#2b2e37!important;border:1px solid #464b5c;border-radius:14px;padding:14px;cursor:pointer;color:#fff!important}.card *{color:#fff!important}.card.active{border-color:#9dd41a;box-shadow:0 0 0 2px #9dd41a40}
 .wizard-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}.wiz{padding:8px 12px;border-radius:999px;background:#2f3340;color:#d0d5e4;border:1px solid #434a5b;cursor:pointer}.wiz.active{background:#9dd41a;color:#13151a;border-color:#9dd41a}
 .step{opacity:0;transform:translateY(10px);transition:.3s;max-height:0;overflow:hidden}.step.active{opacity:1;transform:none;max-height:2200px}
 .step input,.step select{display:block;width:100%;max-width:620px;margin:8px 0;padding:12px;border:1px solid #4c5368;border-radius:12px;background:#1b1d24;color:#fff}
@@ -66,7 +66,28 @@ document.addEventListener('click',e=>{const c=e.target.closest('.card');if(!c)re
 document.getElementById('toStep1').onclick=()=>goStep(1);
 document.getElementById('toStep3').onclick=()=>{document.querySelector('[data-step="3"]').style.display='block';goStep(3);upd();}
 
-document.getElementById('findArena').onclick=()=>{const d=document.getElementById('date').value;const t=document.getElementById('time').value;if(!state.package||!d||!t){alert('Выберите дату/время/пакет');return;}const end=new Date(`2000-01-01T${t}:00`);end.setHours(end.getHours()+state.package.arenaHours);const ee=String(end.getHours()).padStart(2,'0')+':'+String(end.getMinutes()).padStart(2,'0');document.getElementById('slots').innerHTML=`<div class='card active'>Слот: ${t}-${ee}</div>`;document.querySelector('[data-step="2"]').style.display='block';goStep(2);};
+document.getElementById('findArena').onclick=()=>{
+  const d=document.getElementById('date').value;
+  const t=document.getElementById('time').value;
+  if(!state.package||!d||!t){alert('Выберите дату/время/пакет');return;}
+  const end=new Date(`2000-01-01T${t}:00`);
+  end.setHours(end.getHours()+state.package.arenaHours);
+  const ee=String(end.getHours()).padStart(2,'0')+':'+String(end.getMinutes()).padStart(2,'0');
+  document.getElementById('slots').innerHTML=`<div class='card active'>Слот: ${t}-${ee}</div>`;
+
+  const guests=(+document.getElementById('guests')?.value||0);
+  const url=`/svstolviar.php?dat=${encodeURIComponent(d)}&start=${encodeURIComponent(t)}&stop=${encodeURIComponent(ee)}&kol=${guests}&voz=0&zal=4&ok=2&t=${Date.now()}`;
+  fetch(url).then(r=>r.text()).then(txt=>{
+    let arr=[];
+    try{arr=JSON.parse(txt);}catch(e){arr=[];}
+    const box=document.getElementById('tables');
+    if(!Array.isArray(arr)||!arr.length){box.innerHTML='<div class="card">Нет свободных столов на этот слот</div>';return;}
+    box.innerHTML=arr.map(it=>`<div class="card" data-table="${it.id||''}"><div><b>Зал ${it.zal||'VIP'}</b></div><div>Стол ${it.stol||''}</div><div>Вместимость: ${it.vm||'-'}</div></div>`).join('');
+  });
+
+  document.querySelector('[data-step="2"]').style.display='block';
+  goStep(2);
+};
 
 document.getElementById('toStep4').onclick=()=>{document.querySelector('[data-step="4"]').style.display='block';document.querySelector('[data-step="5"]').style.display='block';document.querySelector('[data-step="6"]').style.display='block';goStep(4);upd();}
 
