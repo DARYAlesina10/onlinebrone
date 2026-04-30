@@ -4,21 +4,31 @@ Template name: виар онлайн брони NEW
 */
 get_header();
 ?>
-<section class="vr-booking">
+<section class="vr-booking container-fluid py-4"><div class="container-xxl">
   <aside class="vr-summary" id="vrSummary"><h3>Ваш заказ</h3><ul id="summaryList"></ul><div class="sum">Итого: <b id="summaryTotal">0</b> ₽</div></aside>
   <div class="vr-main">
     <h1>Онлайн-бронирование VR праздника</h1>
     <div class="wizard-nav" id="wizardNav"></div>
-    <div class="step" data-step="0"><h2>0. Дата и время</h2><input type="date" id="date"><input type="time" id="time"><button id="toStep1">Далее</button></div>
-    <div class="step" data-step="1" style="display:none"><h2>1. Пакет</h2><div id="packages" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="0">Назад</button><button id="findArena">Показать свободные слоты</button></div><div id="slots"></div></div>
-    <div class="step" data-step="2" style="display:none"><h2>2. Гости</h2><input id="guests" type="number" placeholder="Количество гостей"><input id="kidname" placeholder="Имя именинника"><input id="parent" placeholder="Имя родителя"><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
-    <div class="step" data-step="3" style="display:none"><h2>3. Игры (Арена + Парк ужасов)</h2><div id="games" class="cards"></div></div>
-    <div class="step" data-step="4" style="display:none"><h2>4. Украшения</h2><div id="decor" class="cards"></div><h2>5. Еда</h2><div id="food" class="cards"></div></div>
-    <div class="step" data-step="5" style="display:none"><h2>Отправка</h2><input id="phone" placeholder="Телефон"><div class="step-actions"><button class="ghost prev" data-prev="4">Назад</button><button id="sendOrder">Отправить</button></div></div>
+    <div class="step" data-step="0"><h2>Дата и время праздника</h2><input type="date" id="date"><input type="time" id="time" step="1800"><button id="toStep1">Далее</button></div>
+    <div class="step" data-step="1" style="display:none"><h2>Выбор пакета</h2><div id="packages" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="0">Назад</button><button id="findArena">Показать свободные слоты</button></div></div>
+    <div class="step" data-step="2" style="display:none"><h2>Выбор стола и арены</h2><div id="slots"></div><div class="cards" id="tables"><div class="card">VIP 1</div><div class="card">VIP 2</div><div class="card">VIP 3</div></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
+    <div class="step" data-step="3" style="display:none"><h2>Данные о гостях</h2><input id="guests" type="number" placeholder="Количество гостей"><input id="kidname" placeholder="Имя именинника"><input id="parent" placeholder="Имя родителя"><div class="step-actions"><button class="ghost prev" data-prev="2">Назад</button><button id="toStep4">Далее</button></div></div><div class="step" data-step="4" style="display:none"><h2>Выбор арены и игры</h2><div id="games" class="cards"></div></div>
+    <div class="step" data-step="5" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><h2>Еда</h2><div id="food" class="cards"></div></div>
+    <div class="step" data-step="6" style="display:none"><h2>Отправка</h2><input id="phone" placeholder="Телефон"><div class="step-actions"><button class="ghost prev" data-prev="5">Назад</button><button id="sendOrder">Отправить</button></div></div>
   </div>
-</section>
+</div></section>
 <style>
-.vr-booking{display:grid;grid-template-columns:1fr 320px;gap:20px;max-width:1280px;margin:30px auto;font-family:Montserrat,sans-serif}.vr-main{background:#fff;padding:24px;border-radius:18px}.vr-summary{position:sticky;top:20px;height:fit-content;background:#111827;color:#fff;padding:18px;border-radius:16px}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card{border:1px solid #d9e4ff;border-radius:14px;padding:12px;cursor:pointer}.card.active{border-color:#22c55e;box-shadow:0 0 0 2px #22c55e33}.wizard-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}.wiz{padding:8px 12px;border-radius:999px;background:#eef2ff;color:#334155;font-weight:600;cursor:pointer;transition:.25s}.wiz.active{background:#22c55e;color:#fff;transform:translateY(-1px)}.step{opacity:0;transform:translateY(16px);transition:.35s;max-height:0;overflow:hidden}.step.active{opacity:1;transform:none;max-height:2000px}.step input,.step select{display:block;width:100%;max-width:520px;margin:8px 0;padding:12px;border:1px solid #dbe4ef;border-radius:12px}.step-actions{display:flex;gap:8px;margin-top:10px}.step button{background:#a4d013;border:0;border-radius:10px;padding:10px 14px;color:#fff;font-weight:700}.step .ghost{background:#e2e8f0;color:#0f172a}
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap");
+.vr-booking{font-family:Montserrat,sans-serif;background:#17181d;color:#fff;min-height:100vh}.vr-booking .container-xxl{max-width:1400px}
+.vr-booking .vr-main{background:#22242b;border:1px solid #353945;padding:28px;border-radius:18px}
+.vr-booking .vr-summary{position:sticky;top:20px;height:fit-content;background:#1f2128;border:1px solid #393d4c;color:#fff;padding:18px;border-radius:16px}
+.vr-booking{display:block}.vr-booking .container-xxl>.vr-summary{float:right;width:340px;margin-left:20px}.vr-booking .container-xxl>.vr-main{overflow:hidden}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{background:#2b2e37;border:1px solid #464b5c;border-radius:14px;padding:14px;cursor:pointer;color:#fff}.card.active{border-color:#9dd41a;box-shadow:0 0 0 2px #9dd41a40}
+.wizard-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}.wiz{padding:8px 12px;border-radius:999px;background:#2f3340;color:#d0d5e4;border:1px solid #434a5b;cursor:pointer}.wiz.active{background:#9dd41a;color:#13151a;border-color:#9dd41a}
+.step{opacity:0;transform:translateY(10px);transition:.3s;max-height:0;overflow:hidden}.step.active{opacity:1;transform:none;max-height:2200px}
+.step input,.step select{display:block;width:100%;max-width:620px;margin:8px 0;padding:12px;border:1px solid #4c5368;border-radius:12px;background:#1b1d24;color:#fff}
+.step-actions{display:flex;gap:8px;margin-top:10px}.step button{background:#9dd41a;border:0;border-radius:10px;padding:10px 14px;color:#111;font-weight:700}.step .ghost{background:#2d3240;color:#fff}
+@media (max-width:1100px){.vr-booking .container-xxl>.vr-summary{float:none;width:100%;margin:0 0 16px 0}.cards{grid-template-columns:1fr 1fr}}@media (max-width:700px){.cards{grid-template-columns:1fr}}
 </style>
 <script>
 const PACKAGES=[
@@ -30,7 +40,7 @@ const state={step:0};
 const games=[['Magic',0],['Zombie Vegas',0],['Party 2',0],['Horror',0],['Tactics',0],['Battle',0],['Zombies',0],['Party Games',0]];
 const decor=[['Базовое украшение',4500],['Премиум украшение',9000]];
 const food=[['Сет праздничный',5500],['Напитки',2500],['Торт',4000]];
-const STEP_TITLES=['0. Дата и время','1. Пакет','2. Гости','3. Игры','4. Украшения и еда','5. Отправка'];
+const STEP_TITLES=['Дата и время','Пакет','Стол и арена','Гости','Игры','Украшения и еда','Отправка'];
 function goStep(n){
   state.step=n;
   document.querySelectorAll('.step').forEach(el=>el.classList.remove('active'));
@@ -54,9 +64,11 @@ function isWeekend(d){const x=new Date(d);const day=x.getDay();return day===0||d
 document.addEventListener('click',e=>{const c=e.target.closest('.card');if(!c)return;const k=c.dataset.k,i=+c.dataset.i; c.parentElement.querySelectorAll('.card').forEach(x=>x.classList.remove('active')); c.classList.add('active'); if(k==='package'){state.package=PACKAGES[i];const g=+document.getElementById('guests').value||8;const t=tier(g);state.packagePrice=(isWeekend(document.getElementById('date').value)?state.package.prices.we:state.package.prices.wd)[t]} else {state[k]=[ (k==='game'?games: k==='decor'?decor:food)[i] ];} upd();});
 
 document.getElementById('toStep1').onclick=()=>goStep(1);
-document.getElementById('toStep3').onclick=()=>{document.querySelector('[data-step="3"]').style.display='block';document.querySelector('[data-step="4"]').style.display='block';document.querySelector('[data-step="5"]').style.display='block';goStep(3);upd();}
+document.getElementById('toStep3').onclick=()=>{document.querySelector('[data-step="3"]').style.display='block';goStep(3);upd();}
 
 document.getElementById('findArena').onclick=()=>{const d=document.getElementById('date').value;const t=document.getElementById('time').value;if(!state.package||!d||!t){alert('Выберите дату/время/пакет');return;}const end=new Date(`2000-01-01T${t}:00`);end.setHours(end.getHours()+state.package.arenaHours);const ee=String(end.getHours()).padStart(2,'0')+':'+String(end.getMinutes()).padStart(2,'0');document.getElementById('slots').innerHTML=`<div class='card active'>Слот: ${t}-${ee}</div>`;document.querySelector('[data-step="2"]').style.display='block';goStep(2);};
+
+document.getElementById('toStep4').onclick=()=>{document.querySelector('[data-step="4"]').style.display='block';document.querySelector('[data-step="5"]').style.display='block';document.querySelector('[data-step="6"]').style.display='block';goStep(4);upd();}
 
 document.getElementById('sendOrder').onclick=()=>alert('Заявка собрана. Подключим отправку в ваш текущий endpoint следующим шагом.');
 </script>
