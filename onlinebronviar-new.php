@@ -34,9 +34,9 @@ get_header();
     <div class="wizard-nav" id="wizardNav"></div>
     <div class="step" data-step="0"><h2>Дата и время праздника</h2><input type="date" id="date"><input type="time" id="time" step="1800"><button id="toStep1">Далее</button></div>
     <div class="step" data-step="1" style="display:none"><h2>Выбор пакета</h2><div id="packages" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="0">Назад</button><button id="findArena">Показать свободные слоты</button></div></div>
-    <div class="step" data-step="2" style="display:none"><h2>Выбор стола и арены</h2><div id="slots"></div><div class="cards" id="tables"></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
+    <div class="step" data-step="2" style="display:none"><h2>Комната праздника</h2><div id="slots"></div><div class="cards" id="tables"></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
     <div class="step" data-step="3" style="display:none"><h2>Данные о гостях</h2><input id="guests" type="number" placeholder="Количество гостей"><input id="kidname" placeholder="Имя именинника"><input id="parent" placeholder="Имя родителя"><div class="step-actions"><button class="ghost prev" data-prev="2">Назад</button><button id="toStep4">Далее</button></div></div><div class="step" data-step="4" style="display:none"><h2>Выбор арены и игры</h2><div id="games" class="cards"></div></div>
-    <div class="step" data-step="5" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><h2>Еда</h2><div id="food" class="cards"></div></div>
+    <div class="step" data-step="5" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="4">Назад</button><button id="toStep6">Далее</button></div></div><div class="step" data-step="6" style="display:none"><h2>Еда</h2><div id="food" class="cards"></div></div>
     
   </div>
 </div></section>
@@ -60,10 +60,10 @@ const PACKAGES=[
 {name:'Макс',roomHours:4,arenaHours:3,prices:{wd:[26000,32000,36000],we:[36000,42000,46000]}}
 ];
 const state={step:0};
-const games=[];
+const games=[{name:"Magic",price:0,img:"https://vr-pandoroom.org/img/49736595_587_q70.webp"},{name:"Zombie Vegas",price:0,img:"https://vr-pandoroom.org/img/49736607_587_q70.webp"},{name:"Party 2",price:0,img:"https://vr-pandoroom.org/img/49736609_587_q70.webp"},{name:"Horror",price:0,img:"https://vr-pandoroom.org/img/49736613_588_q70.webp"}];
 const decor=<?php echo json_encode(array_values($decorItems), JSON_UNESCAPED_UNICODE); ?>;
 const food=<?php echo json_encode(array_values($foodItems), JSON_UNESCAPED_UNICODE); ?>;
-const STEP_TITLES=['Дата и время','Пакет','Стол и арена','Гости','Игры','Украшения и еда'];
+const STEP_TITLES=['Дата и время','Пакет','Комната праздника','Гости','Игры','Украшения','Еда'];
 function goStep(n){
   state.step=n;
   document.querySelectorAll('.step').forEach(el=>el.classList.remove('active'));
@@ -85,8 +85,8 @@ function renderCards(id,data,key){
     return `<div class='card' data-k='${key}' data-i='${i}'>${img?`<img src='${img}' style='width:100%;height:130px;object-fit:cover;margin-bottom:8px'>`:''}<div>${n}</div><div>${p} ₽</div>${controls}</div>`;
   }).join('')
 }
-renderCards('packages',PACKAGES,'package');renderCards('games',games,'game');renderCards('decor',decor,'decor');renderCards('food',food,'food');renderCards('games',games,'game');renderCards('decor',decor,'decor');renderCards('food',food,'food');
-function upd(){const list=[];let total=0;if(state.package){list.push('Пакет: '+state.package.name);total+=state.packagePrice||0}['game','decor','food'].forEach(k=>{Object.entries(state[k]||{}).forEach(([idx,qty])=>{const src=(k==='game'?games:k==='decor'?decor:food)[idx];if(!src)return;list.push((src.name||src[0])+' x'+qty);total+=(src.price||src[1]||0)*qty;});});document.getElementById('summaryList').innerHTML=list.map(x=>`<li>${x}</li>`).join('');document.getElementById('summaryTotal').innerText=total}
+renderCards('packages',PACKAGES,'package');renderCards('games',games,'game');renderCards('decor',decor,'decor');renderCards('food',food,'food');
+function upd(){const list=[];let total=0;if(state.package){list.push('Пакет: '+state.package.name);total+=state.packagePrice||0} if(state.room){list.push('Комната: '+state.room.name);} ['game','decor','food'].forEach(k=>{Object.entries(state[k]||{}).forEach(([idx,qty])=>{const src=(k==='game'?games:k==='decor'?decor:food)[idx];if(!src)return;list.push((src.name||src[0])+' x'+qty);total+=(src.price||src[1]||0)*qty;});});document.getElementById('summaryList').innerHTML=list.map(x=>`<li>${x}</li>`).join('');document.getElementById('summaryTotal').innerText=total}
 function tier(g){return g<=8?0:g<=16?1:2}
 function isWeekend(d){const x=new Date(d);const day=x.getDay();return day===0||day===6}
 
@@ -97,6 +97,7 @@ document.addEventListener('click',e=>{
   const c=e.target.closest('.card');if(!c)return;const k=c.dataset.k,i=+c.dataset.i;
   if(k==='package'){ c.parentElement.querySelectorAll('.card').forEach(x=>x.classList.remove('active')); c.classList.add('active'); state.package=PACKAGES[i];const g=+document.getElementById('guests')?.value||8;const t=tier(g);state.packagePrice=(isWeekend(document.getElementById('date').value)?state.package.prices.we:state.package.prices.wd)[t];}
   if(k==='game'){ state.game={}; state.game[i]=1; c.parentElement.querySelectorAll('.card').forEach(x=>x.classList.remove('active')); c.classList.add('active'); }
+  if(c.parentElement && c.parentElement.id==='tables'){ state.room={name:c.innerText.split('\n')[0]||'Комната'}; c.parentElement.querySelectorAll('.card').forEach(x=>x.classList.remove('active')); c.classList.add('active'); }
   upd();
 });
 
@@ -126,7 +127,8 @@ document.getElementById('findArena').onclick=()=>{
   goStep(2);
 };
 
-document.getElementById('toStep4').onclick=()=>{const d=document.getElementById('date').value;const t=document.getElementById('time').value; fetch(window.location.href+'?date='+encodeURIComponent(d)+'&st='+encodeURIComponent(t)+'&sp='+encodeURIComponent(t)).then(r=>r.text()).then(html=>{ if(html&&html.indexOf('quests-info__time')>-1){document.getElementById('games').innerHTML=html;} }); document.querySelector('[data-step="4"]').style.display='block';document.querySelector('[data-step="5"]').style.display='block';goStep(4);upd();}
+document.getElementById('toStep4').onclick=()=>{document.querySelector('[data-step="4"]').style.display='block';document.querySelector('[data-step="5"]').style.display='block';goStep(4);upd();}
+document.getElementById('toStep6').onclick=()=>{document.querySelector('[data-step="6"]').style.display='block';goStep(6);upd();}
 
 
 </script>
