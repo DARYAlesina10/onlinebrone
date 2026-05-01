@@ -28,7 +28,7 @@ if(!$decorItems){$decorItems=[['name'=>'Базовое украшение','pric
 get_header();
 ?>
 <section class="vr-booking container-fluid py-4"><div class="container-xxl">
-  <aside class="vr-summary" id="vrSummary"><h3>Ваш заказ</h3><ul id="summaryList"></ul><div class="sum">Итого: <b id="summaryTotal">0</b> ₽</div><div id="finalPanel" style="display:none"><input id="phone" placeholder="Телефон"><div class="step-actions"><button id="getCode" class="ghost">Получить SMS код</button></div><input id="smsCode" placeholder="Код из SMS"><button id="sendOrder">Отправить</button><button id="backToForm" class="ghost" style="margin-top:8px">Вернуться к заполнению</button></div></aside>
+  <aside class="vr-summary" id="vrSummary"><h3>Ваш заказ</h3><button id="finishFlowSide" type="button" class="ghost" style="width:100%;margin-bottom:10px">Завершить заполнение</button><ul id="summaryList"></ul><div class="sum">Итого: <b id="summaryTotal">0</b> ₽</div><div id="finalPanel" style="display:none"><input id="phone" placeholder="Телефон"><div class="step-actions"><button id="getCode" class="ghost">Получить SMS код</button></div><input id="smsCode" placeholder="Код из SMS"><button id="sendOrder">Отправить</button><button id="backToForm" class="ghost" style="margin-top:8px">Вернуться к заполнению</button></div></aside>
   <div class="vr-main">
     <h1>Онлайн-бронирование VR праздника</h1>
     <div class="wizard-nav" id="wizardNav"></div>
@@ -36,7 +36,8 @@ get_header();
     <div class="step" data-step="1" style="display:none"><h2>Выбор пакета</h2><div id="packages" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="0">Назад</button><button id="findArena">Показать свободные слоты</button></div></div>
     <div class="step" data-step="2" style="display:none"><h2>Комната праздника</h2><div id="slots"></div><div class="cards" id="tables"></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
     <div class="step" data-step="3" style="display:none"><h2>Выбор арены и игры</h2><div id="games" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="2">Назад</button><button id="toStep4">Далее</button></div></div>
-    <div class="step" data-step="4" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="3">Назад</button><button id="toStep6">Далее</button></div></div><div class="step" data-step="5" style="display:none"><h2>Еда</h2><div id="food" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="4">Назад</button><button id="finishFlow" type="button">Завершить заполнение</button></div></div>
+    <div class="step" data-step="4" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="3">Назад</button><button id="toStep6">Далее</button></div></div>
+    <div class="step" data-step="5" style="display:none"><h2>Еда</h2><div id="food" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="4">Назад</button><button id="finishFlow" type="button">Завершить заполнение</button></div></div>
     
   </div>
 </div></section>
@@ -132,7 +133,9 @@ document.getElementById('findArena').onclick=()=>{
 
 document.getElementById('toStep4').onclick=()=>{document.querySelector('[data-step="4"]').style.display='block';goStep(4);upd();}
 document.getElementById('toStep6').onclick=()=>{document.querySelector('[data-step="5"]').style.display='block';goStep(5);upd();}
-document.getElementById('finishFlow').onclick=()=>{const main=document.querySelector('.vr-main');const panel=document.getElementById('finalPanel');main.style.transition='opacity .4s';main.style.opacity='0';setTimeout(()=>{main.style.display='none';panel.style.display='block';panel.style.opacity='0';panel.style.transition='opacity .4s';setTimeout(()=>panel.style.opacity='1',20);},350);}
+function doFinish(){const main=document.querySelector('.vr-main');const panel=document.getElementById('finalPanel');main.style.transition='opacity .4s';main.style.opacity='0';setTimeout(()=>{main.style.display='none';panel.style.display='block';panel.style.opacity='0';panel.style.transition='opacity .4s';setTimeout(()=>panel.style.opacity='1',20);},350);}
+document.getElementById('finishFlow').onclick=doFinish;
+document.getElementById('finishFlowSide').onclick=doFinish;
 document.getElementById('backToForm').onclick=()=>{document.querySelector('.vr-main').style.display='block';setTimeout(()=>{document.querySelector('.vr-main').style.opacity='1';},20);document.getElementById('finalPanel').style.display='none';}
 document.getElementById('getCode').onclick=()=>alert('SMS код отправлен (демо)');
 document.getElementById('sendOrder').onclick=()=>alert('Заявка отправлена!');
