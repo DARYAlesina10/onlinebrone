@@ -36,7 +36,7 @@ get_header();
     <div class="step" data-step="1" style="display:none"><h2>Выбор пакета</h2><div id="packages" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="0">Назад</button><button id="findArena">Показать свободные слоты</button></div></div>
     <div class="step" data-step="2" style="display:none"><h2>Комната праздника</h2><div id="slots"></div><div class="cards" id="tables"></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
     <div class="step" data-step="3" style="display:none"><h2>Выбор арены и игры</h2><div id="games" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="2">Назад</button><button id="toStep4">Далее</button></div></div>
-    <div class="step" data-step="4" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="3">Назад</button><button id="toStep6">Далее</button></div></div><div class="step" data-step="5" style="display:none"><h2>Еда</h2><div id="food" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="4">Назад</button><button id="finishFlow">Завершить заполнение</button></div></div>
+    <div class="step" data-step="4" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="3">Назад</button><button id="toStep6">Далее</button></div></div><div class="step" data-step="5" style="display:none"><h2>Еда</h2><div id="food" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="4">Назад</button><button id="finishFlow" type="button">Завершить заполнение</button></div></div>
     
   </div>
 </div></section>
@@ -50,7 +50,7 @@ get_header();
 .wizard-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}.wiz{padding:8px 12px;border-radius:999px;background:#2f3340;color:#d0d5e4;border:1px solid #434a5b;cursor:pointer}.wiz.active{background:#9dd41a;color:#13151a;border-color:#9dd41a}
 .step{opacity:0;transform:translateY(10px);transition:.3s;max-height:0;overflow:hidden}.step.active{opacity:1;transform:none;max-height:2200px}
 .step input,.step select{display:block;width:100%;max-width:620px;margin:8px 0;padding:12px;border:1px solid #4c5368;border-radius:12px;background:#1b1d24;color:#fff}
-.step-actions{display:flex;gap:8px;margin-top:10px}.step button{background:#9dd41a;border:0;border-radius:0;padding:10px 14px;color:#111;font-weight:700}.step .ghost{background:#2d3240;color:#fff}
+.pkgcomp{margin-top:6px;color:#cfd7ea;font-size:13px}.pkgrates{margin-top:8px;font-size:13px;line-height:1.5;color:#e7edf9}.pkgsel{margin-top:8px;padding:6px;border:1px solid #55617a}.step-actions{display:flex;gap:8px;margin-top:10px}.step button{background:#9dd41a;border:0;border-radius:0;padding:10px 14px;color:#111;font-weight:700}.step .ghost{background:#2d3240;color:#fff}
 @media (max-width:1100px){.vr-booking .container-xxl>.vr-summary{float:none;width:100%;margin:0 0 16px 0}.cards{grid-template-columns:1fr 1fr}}@media (max-width:700px){.cards{grid-template-columns:1fr}}
 </style>
 <script>
@@ -77,12 +77,14 @@ function buildNav(){
 }
 const tsel=document.getElementById('time'); for(let h=10;h<=22;h++){['00','30'].forEach(m=>{if(h===22&&m==='30')return;const v=String(h).padStart(2,'0')+':'+m; tsel.insertAdjacentHTML('beforeend',`<option value='${v}'>${v}</option>`);});}
 buildNav();goStep(0);
+['date','guests'].forEach(id=>document.getElementById(id)?.addEventListener('change',()=>renderCards('packages',PACKAGES,'package')));
 document.addEventListener('click',e=>{const g=e.target.closest('.wiz'); if(g){goStep(+g.dataset.go)} const p=e.target.closest('.prev'); if(p){goStep(+p.dataset.prev)}});
 
 function renderCards(id,data,key){
   document.getElementById(id).innerHTML=data.map((x,i)=>{
     const n=x.name||x[0]; const p=x.price||x[1]||0; const img=x.img||'';
     const controls=(key==='food'||key==='decor')?`<div class="qty"><button class="qtym" data-k="${key}" data-i="${i}">-</button><span id="q_${key}_${i}">0</span><button class="qtyp" data-k="${key}" data-i="${i}">+</button></div>`:'';
+    if(key==='package'){const g=+document.getElementById('guests')?.value||8;const t=tier(g);const weekend=isWeekend(document.getElementById('date')?.value);const cur=(weekend?x.prices.we:x.prices.wd)[t];const comp=`<div class='pkgcomp'>Банкетная комната ${x.roomHours} ч и ${x.arenaHours}:50 игры</div><div class='pkgrates'><div>До 8: ${(weekend?x.prices.we[0]:x.prices.wd[0])} ₽</div><div>До 16: ${(weekend?x.prices.we[1]:x.prices.wd[1])} ₽</div><div>До 20: ${(weekend?x.prices.we[2]:x.prices.wd[2])} ₽</div></div><div class='pkgsel'>Ваша цена: <b>${cur} ₽</b></div>`; return `<div class='card' data-k='${key}' data-i='${i}'><div>${n}</div>${comp}</div>`;}
     return `<div class='card' data-k='${key}' data-i='${i}'>${img?`<img src='${img}' style='width:100%;height:130px;object-fit:cover;margin-bottom:8px'>`:''}<div>${n}</div><div>${p} ₽</div>${controls}</div>`;
   }).join('')
 }
@@ -130,7 +132,7 @@ document.getElementById('findArena').onclick=()=>{
 
 document.getElementById('toStep4').onclick=()=>{document.querySelector('[data-step="4"]').style.display='block';goStep(4);upd();}
 document.getElementById('toStep6').onclick=()=>{document.querySelector('[data-step="5"]').style.display='block';goStep(5);upd();}
-document.getElementById('finishFlow').onclick=()=>{document.querySelector('.vr-main').style.transition='opacity .4s';document.querySelector('.vr-main').style.opacity='0';setTimeout(()=>{document.querySelector('.vr-main').style.display='none';document.getElementById('finalPanel').style.display='block';},350);}
+document.getElementById('finishFlow').onclick=()=>{const main=document.querySelector('.vr-main');const panel=document.getElementById('finalPanel');main.style.transition='opacity .4s';main.style.opacity='0';setTimeout(()=>{main.style.display='none';panel.style.display='block';panel.style.opacity='0';panel.style.transition='opacity .4s';setTimeout(()=>panel.style.opacity='1',20);},350);}
 document.getElementById('backToForm').onclick=()=>{document.querySelector('.vr-main').style.display='block';setTimeout(()=>{document.querySelector('.vr-main').style.opacity='1';},20);document.getElementById('finalPanel').style.display='none';}
 document.getElementById('getCode').onclick=()=>alert('SMS код отправлен (демо)');
 document.getElementById('sendOrder').onclick=()=>alert('Заявка отправлена!');
