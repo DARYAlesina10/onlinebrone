@@ -28,7 +28,7 @@ if(!$decorItems){$decorItems=[['name'=>'Базовое украшение','pric
 get_header();
 ?>
 <section class="vr-booking container-fluid py-4"><div class="container-xxl">
-  <aside class="vr-summary" id="vrSummary"><h3>Ваш заказ</h3><button id="finishFlowSide" type="button" class="ghost" style="width:100%;margin-bottom:10px">Завершить заполнение</button><ul id="summaryList"></ul><div class="sum">Итого: <b id="summaryTotal">0</b> ₽</div><div id="finalPanel" style="display:none"><input id="phone" placeholder="Телефон"><div class="step-actions"><button id="getCode" class="ghost">Получить SMS код</button></div><input id="smsCode" placeholder="Код из SMS"><button id="sendOrder">Отправить</button><button id="backToForm" class="ghost" style="margin-top:8px">Вернуться к заполнению</button></div></aside>
+  <aside class="vr-summary" id="vrSummary"><h3>Ваш заказ</h3><button id="toggleOrder" type="button" class="ghost" style="width:100%;margin-bottom:8px">Ваш заказ</button><button id="collapseOrder" type="button" class="ghost" style="width:100%;margin-bottom:8px;display:none">Свернуть список</button><div id="orderWrap" style="display:none"><ul id="summaryList"></ul></div><div class="sum">Итого: <b id="summaryTotal">0</b> ₽</div><button id="finishFlowSide" type="button" class="ghost" style="width:100%;margin:8px 0">Завершить заполнение</button><div id="finalPanel" style="display:none"><input id="phone" placeholder="Телефон"><div class="step-actions"><button id="getCode" class="ghost">Получить SMS код</button></div><input id="smsCode" placeholder="Код из SMS"><button id="sendOrder">Отправить</button><button id="backToForm" class="ghost" style="margin-top:8px">Вернуться к заполнению</button></div></aside>
   <div class="vr-main">
     <h1>Онлайн-бронирование VR праздника</h1>
     <div class="wizard-nav" id="wizardNav"></div>
@@ -51,7 +51,7 @@ get_header();
 .wizard-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}.wiz{padding:8px 12px;border-radius:999px;background:#2f3340;color:#d0d5e4;border:1px solid #434a5b;cursor:pointer}.wiz.active{background:#9dd41a;color:#13151a;border-color:#9dd41a}
 .step{opacity:0;transform:translateY(10px);transition:.3s;max-height:0;overflow:hidden}.step.active{opacity:1;transform:none;max-height:2200px}
 .step input,.step select{display:block;width:100%;max-width:620px;margin:8px 0;padding:12px;border:1px solid #4c5368;border-radius:12px;background:#1b1d24;color:#fff}
-.pkgcomp{margin-top:6px;color:#cfd7ea;font-size:13px}.pkgrates{margin-top:8px;font-size:13px;line-height:1.5;color:#e7edf9}.pkgsel{margin-top:8px;padding:6px;border:1px solid #55617a}.qty{display:flex;align-items:center;gap:8px;margin-top:10px}.qty button{width:32px;height:32px;line-height:32px;padding:0;border-radius:0;background:#9dd41a;color:#111;font-weight:800}.qval{min-width:24px;text-align:center;font-weight:700}.game-card{position:relative}.gtag{position:absolute;z-index:2;top:8px;left:8px;background:#19d8d2;color:#032;padding:4px 10px;font-size:12px}.gtitle{font-size:38px;font-weight:700}.bookbtn{background:#9dd41a;border:0;padding:8px 14px}.step-actions{display:flex;gap:8px;margin-top:10px}.step button{background:#9dd41a;border:0;border-radius:0;padding:10px 14px;color:#111;font-weight:700}.step .ghost{background:#2d3240;color:#fff}
+.pkgcomp{margin-top:6px;color:#cfd7ea;font-size:13px}.pkgrates{margin-top:8px;font-size:13px;line-height:1.5;color:#e7edf9}.pkgsel{margin-top:8px;padding:6px;border:1px solid #55617a}.qty{display:flex;align-items:center;gap:8px;margin-top:10px}.qty button{width:32px;height:32px;line-height:32px;padding:0;border-radius:0;background:#9dd41a;color:#111;font-weight:800}.qval{min-width:24px;text-align:center;font-weight:700}.game-card{position:relative}.gtag{position:absolute;z-index:2;top:8px;left:8px;background:#19d8d2;color:#032;padding:4px 10px;font-size:12px}.gtitle{font-size:38px;font-weight:700}.bookbtn{background:#9dd41a;border:0;padding:8px 14px}.step-actions{display:flex;gap:8px;margin-top:10px}.step button,.vr-summary button,.bookbtn,.qty button{background:#9dd41a;border:0;border-radius:0;padding:10px 14px;color:#fff;font-weight:500;font-size:15px}.step .ghost,#toggleOrder,#collapseOrder{background:#2d3240;color:#fff}.step input,.step select,#finalPanel input{background:#1b1d24;border:1px solid #4c5368;color:#fff;border-radius:0}.sum{font-size:20px;margin:8px 0}#orderWrap li{list-style:none;border-bottom:1px dashed #4c5368;padding:6px 0}@media (max-width:700px){.vr-summary{position:fixed!important;left:0;right:0;bottom:0;top:auto!important;width:100%!important;margin:0!important;z-index:9999;border-radius:0!important}}
 @media (max-width:1100px){.vr-booking .container-xxl>.vr-summary{float:none;width:100%;margin:0 0 16px 0}.cards{grid-template-columns:1fr 1fr}}@media (max-width:700px){.cards{grid-template-columns:1fr}}
 </style>
 <script>
@@ -123,7 +123,7 @@ document.getElementById('findArena').onclick=()=>{
     let arr=[];
     try{arr=JSON.parse(txt);}catch(e){arr=[];}
     const box=document.getElementById('tables');
-    if(!Array.isArray(arr)||!arr.length){box.innerHTML='<div class="card">Нет свободных столов на этот слот</div>';return;}
+    if(!Array.isArray(arr)||!arr.length){let alt=''; ['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30'].forEach(function(ti){alt += '<button class=\"ghost altTime\" data-time=\"'+ti+'\" style=\"margin:4px\">'+d+' '+ti+'</button>';}); box.innerHTML='<div class=\"card\">Нет свободных столов. Измените дату/время:</div>'+alt;return;}
     arr=arr.filter(it=>String(it.zal)==='4'||String(it.zal).toLowerCase()==='viar'); box.innerHTML=arr.map(it=>`<div class="card" data-table="${it.id||''}">${it.kar?`<img src='${it.kar}' style='width:100%;height:120px;object-fit:cover;margin-bottom:8px'>`:''}<div><b>Зал 4 (VR Arena)</b></div><div>Стол ${it.stol||''}</div><div>Вместимость: ${it.vm||'-'}</div><div>${it.op||''}</div></div>`).join('');
   });
 
@@ -133,13 +133,21 @@ document.getElementById('findArena').onclick=()=>{
 
 document.getElementById('toStep4').onclick=()=>{document.querySelector('[data-step="4"]').style.display='block';goStep(4);upd();}
 document.getElementById('toStep6').onclick=()=>{document.querySelector('[data-step="5"]').style.display='block';goStep(5);upd();}
-function doFinish(){const main=document.querySelector('.vr-main');const panel=document.getElementById('finalPanel');main.style.transition='opacity .4s';main.style.opacity='0';setTimeout(()=>{main.style.display='none';panel.style.display='block';panel.style.opacity='0';panel.style.transition='opacity .4s';setTimeout(()=>panel.style.opacity='1',20);},350);}
+function doFinish(){const main=document.querySelector('.vr-main');const panel=document.getElementById('finalPanel');const summary=document.getElementById('vrSummary');main.style.transition='opacity .4s';main.style.opacity='0';setTimeout(()=>{main.style.display='none';summary.style.float='none';summary.style.width='100%';panel.style.display='block';panel.style.opacity='0';panel.style.transition='opacity .4s';setTimeout(()=>panel.style.opacity='1',20);},350);}
 document.getElementById('finishFlow').onclick=doFinish;
 document.getElementById('finishFlowSide').onclick=doFinish;
 document.getElementById('backToForm').onclick=()=>{document.querySelector('.vr-main').style.display='block';setTimeout(()=>{document.querySelector('.vr-main').style.opacity='1';},20);document.getElementById('finalPanel').style.display='none';}
 document.getElementById('getCode').onclick=()=>alert('SMS код отправлен (демо)');
 document.getElementById('sendOrder').onclick=()=>alert('Заявка отправлена!');
 
+
+
+document.addEventListener('click',function(e){
+ if(e.target.classList.contains('altTime')){ var tm=e.target.getAttribute('data-time'); document.getElementById('time').value=tm; goStep(0); renderCards('packages',PACKAGES,'package'); }
+ if(e.target.id==='toggleOrder'){ document.getElementById('orderWrap').style.display='block'; document.getElementById('collapseOrder').style.display='block'; }
+ if(e.target.id==='collapseOrder'){ document.getElementById('orderWrap').style.display='none'; document.getElementById('collapseOrder').style.display='none'; }
+ if(e.target.classList.contains('bookbtn')){ var card=e.target.closest('.card'); var i=card?card.dataset.i:null; if(i===null)return; var v=prompt('Время игры: 30, 60, 90 или package','package'); state.gameDur=state.gameDur||{}; state.gameDur[i]=v||'package'; }
+});
 
 </script>
 <?php get_footer(); ?>
