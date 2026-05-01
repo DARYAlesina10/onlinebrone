@@ -35,7 +35,7 @@ get_header();
     <div class="step" data-step="0"><h2>Дата, время и гости</h2><div class="row gx-2"><div class="col-md-4"><input type="date" id="date"></div><div class="col-md-4"><select id="time" class="form-select"></select></div><div class="col-md-4"><input id="guests" type="number" placeholder="Количество гостей"></div></div><div class="row gx-2"><div class="col-md-6"><input id="kidname" placeholder="Имя именинника"></div><div class="col-md-6"><input id="parent" placeholder="Имя родителя"></div></div><button id="toStep1">Далее</button></div>
     <div class="step" data-step="1" style="display:none"><h2>Выбор пакета</h2><div id="packages" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="0">Назад</button><button id="findArena">Показать свободные слоты</button></div></div>
     <div class="step" data-step="2" style="display:none"><h2>Комната праздника</h2><div id="slots"></div><div class="cards" id="tables"></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
-    <div class="step" data-step="3" style="display:none"><h2>Выбор арены и игры</h2><div id="games" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="2">Назад</button><button id="toStep4">Далее</button></div></div>
+    <div class="step" data-step="3" style="display:none"><h2>Выбор арены и игры</h2><div id="gameRemain" class="pkgsel" style="margin-bottom:10px">Остаток времени игры: —</div><div id="games" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="2">Назад</button><button id="toStep4">Далее</button></div></div>
     <div class="step" data-step="4" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="3">Назад</button><button id="toStep6">Далее</button></div></div>
     <div class="step" data-step="5" style="display:none"><h2>Еда</h2><div id="food" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="4">Назад</button><button id="finishFlow" type="button">Завершить заполнение</button></div></div>
     
@@ -85,12 +85,12 @@ function renderCards(id,data,key){
   document.getElementById(id).innerHTML=data.map((x,i)=>{
     const n=x.name||x[0]; const p=x.price||x[1]||0; const img=x.img||'';
     const controls=(key==='food'||key==='decor')?`<div class="qty"><button class="qtym" data-k="${key}" data-i="${i}">−</button><span class="qval" id="q_${key}_${i}">0</span><button class="qtyp" data-k="${key}" data-i="${i}">+</button></div>`:'';
-    if(key==='package'){const g=+document.getElementById('guests')?.value||8;const t=tier(g);const weekend=isWeekend(document.getElementById('date')?.value);const cur=(weekend?x.prices.we:x.prices.wd)[t];const comp=`<div class='pkgcomp'>Банкетная комната ${x.roomHours} ч и ${x.arenaHours}:50 игры</div><div class='pkgrates'><div>До 8: ${(weekend?x.prices.we[0]:x.prices.wd[0])} ₽</div><div>До 16: ${(weekend?x.prices.we[1]:x.prices.wd[1])} ₽</div><div>До 20: ${(weekend?x.prices.we[2]:x.prices.wd[2])} ₽</div></div><div class='pkgsel'>Ваша цена: <b>${cur} ₽</b></div>`; return `<div class='card' data-k='${key}' data-i='${i}'><div>${n}</div>${comp}</div>`;}
+    if(key==='package'){const g=+document.getElementById('guests')?.value||8;const t=tier(g);const weekend=isWeekend(document.getElementById('date')?.value);const cur=(weekend?x.prices.we:x.prices.wd)[t];const cheaper=(x.prices.wd[t] < x.prices.we[t]); const comp=`<div class='pkgcomp'>Банкетная комната ${x.roomHours} ч и ${x.arenaHours}:50 игры</div><div class='pkgrates'><div>До 8: ${(weekend?x.prices.we[0]:x.prices.wd[0])} ₽</div><div>До 16: ${(weekend?x.prices.we[1]:x.prices.wd[1])} ₽</div><div>До 20: ${(weekend?x.prices.we[2]:x.prices.wd[2])} ₽</div></div><div class='pkgsel'>Ваша цена: <b>${cur} ₽</b>${(!weekend && cheaper)?' <span style="color:#9dd41a">(будний дешевле)</span>':''}</div>`; return `<div class='card' data-k='${key}' data-i='${i}'><div>${n}</div>${comp}</div>`;}
     if(key==='game'){return `<div class='card game-card' data-k='${key}' data-i='${i}'>${img?`<div class='gtag'>${x.tag||''}</div><img class='gameimg' data-i='${i}' src='${img}' style='width:100%;height:190px;object-fit:cover;margin-bottom:10px'>`:''}<div class='gtitle'>${n}</div><div class='durations'><span class='durbtn' data-min='30' data-i='${i}'>30 мин</span><span class='durbtn' data-min='60' data-i='${i}'>60 мин</span><span class='durbtn' data-min='90' data-i='${i}'>90 мин</span><span class='durbtn' data-min='package' data-i='${i}'>Весь пакет</span></div></div>`;} return `<div class='card' data-k='${key}' data-i='${i}'>${img?`<img src='${img}' style='width:100%;height:130px;object-fit:cover;margin-bottom:8px'>`:''}<div>${n}</div><div>${p} ₽</div>${controls}</div>`;
   }).join('')
 }
 renderCards('packages',PACKAGES,'package');renderCards('games',games,'game');renderCards('decor',decor,'decor');renderCards('food',food,'food');
-function upd(){const list=[];let total=0;if(state.package){list.push('Пакет: '+state.package.name);total+=state.packagePrice||0} if(state.room){list.push('Комната: '+state.room.name);} ['game','decor','food'].forEach(k=>{Object.entries(state[k]||{}).forEach(([idx,qty])=>{const src=(k==='game'?games:k==='decor'?decor:food)[idx];if(!src)return;const unit=(src.price||src[1]||0);list.push((src.name||src[0])+' — '+unit+' ₽ x'+qty+' = '+(unit*qty)+' ₽');total+=unit*qty;});});document.getElementById('summaryList').innerHTML=list.map(x=>`<li>${x}</li>`).join('');document.getElementById('summaryTotal').innerText=total}
+function upd(){const list=[];let total=0;if(state.selDate && state.selTime){list.push('Дата/время: '+state.selDate+' '+state.selTime);} if(state.package){list.push('Пакет: '+state.package.name);total+=state.packagePrice||0} if(state.room){list.push('Комната: '+state.room.name);} if(state.gameDur){Object.entries(state.gameDur).forEach(([gi,m])=>{const g=games[gi]; if(g) list.push('Игра: '+g.name+' — '+m+' мин');});} ['game','decor','food'].forEach(k=>{Object.entries(state[k]||{}).forEach(([idx,qty])=>{const src=(k==='game'?games:k==='decor'?decor:food)[idx];if(!src)return;const unit=(src.price||src[1]||0);list.push((src.name||src[0])+' — '+unit+' ₽ x'+qty+' = '+(unit*qty)+' ₽');total+=unit*qty;});});document.getElementById('summaryList').innerHTML=list.map(x=>`<li>${x}</li>`).join('');document.getElementById('summaryTotal').innerText=total}
 function tier(g){return g<=8?0:g<=16?1:2}
 function isWeekend(d){const x=new Date(d);const day=x.getDay();return day===0||day===6}
 
@@ -111,6 +111,7 @@ document.getElementById('toStep3').onclick=()=>{document.querySelector('[data-st
 document.getElementById('findArena').onclick=()=>{
   const d=document.getElementById('date').value;
   const t=document.getElementById('time').value;
+  state.selDate=d; state.selTime=t;
   if(!state.package||!d||!t){alert('Выберите дату/время/пакет');return;}
   const end=new Date(`2000-01-01T${t}:00`);
   end.setHours(end.getHours()+state.package.arenaHours);
@@ -123,7 +124,7 @@ document.getElementById('findArena').onclick=()=>{
     let arr=[];
     try{arr=JSON.parse(txt);}catch(e){arr=[];}
     const box=document.getElementById('tables');
-    if(!Array.isArray(arr)||!arr.length){let alt=''; ['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30'].forEach(function(ti){alt += '<button class=\"ghost altTime\" data-time=\"'+ti+'\" style=\"margin:4px\">'+d+' '+ti+'</button>';}); box.innerHTML='<div class=\"card\">Нет свободных столов. Измените дату/время:</div>'+alt;return;}
+    if(!Array.isArray(arr)||!arr.length){let alt=''; const base=new Date(d); for(let dd=0;dd<7;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){const wk=(dt.getDay()==0||dt.getDay()==6)?'выходной':'будни'; alt += '<button class=\"ghost altTime\" data-date=\"'+ds+'\" data-time=\"'+ti+'\" style=\"margin:4px\">'+ds+' '+ti+' ('+wk+')</button>';}); } box.innerHTML='<div class=\"card\">Нет свободных столов. Измените дату/время:</div>'+alt;return;}
     arr=arr.filter(it=>String(it.zal)==='4'||String(it.zal).toLowerCase()==='viar'); box.innerHTML=arr.map(it=>`<div class="card" data-table="${it.id||''}">${it.kar?`<img src='${it.kar}' style='width:100%;height:120px;object-fit:cover;margin-bottom:8px'>`:''}<div><b>Зал 4 (VR Arena)</b></div><div>Стол ${it.stol||''}</div><div>Вместимость: ${it.vm||'-'}</div><div>${it.op||''}</div></div>`).join('');
   });
 
@@ -143,7 +144,7 @@ document.getElementById('sendOrder').onclick=()=>alert('Заявка отпра�
 
 
 document.addEventListener('click',function(e){
- if(e.target.classList.contains('altTime')){ var tm=e.target.getAttribute('data-time'); document.getElementById('time').value=tm; goStep(0); renderCards('packages',PACKAGES,'package'); }
+ if(e.target.classList.contains('altTime')){ var tm=e.target.getAttribute('data-time'); var nd=e.target.getAttribute('data-date')||document.getElementById('date').value; document.getElementById('time').value=tm; document.getElementById('date').value=nd; state.selDate=nd; state.selTime=tm; renderCards('packages',PACKAGES,'package'); upd(); }
  if(e.target.id==='toggleOrder'){ document.getElementById('orderWrap').style.display='block'; document.getElementById('collapseOrder').style.display='block'; }
  if(e.target.id==='collapseOrder'){ document.getElementById('orderWrap').style.display='none'; document.getElementById('collapseOrder').style.display='none'; }
  if(e.target.classList.contains('bookbtn')){ var card=e.target.closest('.card'); var i=card?card.dataset.i:null; if(i===null)return; var v=prompt('Время игры: 30, 60, 90 или package','package'); state.gameDur=state.gameDur||{}; state.gameDur[i]=v||'package'; }
@@ -158,7 +159,7 @@ document.addEventListener('click',function(e){
    state.gameDur=state.gameDur||{};
    state.gameDur[i]=(val==='package'?packMin:parseInt(val,10));
    const sum=Object.values(state.gameDur).reduce((a,b)=>a+(+b||0),0);
-   if(sum>packMin){ alert('Превышено время игры по пакету'); delete state.gameDur[i]; return; }
+   if(sum>packMin){ alert('Превышено время игры по пакету'); delete state.gameDur[i]; return; } document.getElementById('gameRemain').innerText='Остаток времени игры: '+(packMin-sum)+' мин';
    e.target.parentElement.querySelectorAll('.durbtn').forEach(x=>x.style.outline='none'); e.target.style.outline='2px solid #fff';
  }
 });
