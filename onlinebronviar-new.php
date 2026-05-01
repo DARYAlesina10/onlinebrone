@@ -51,7 +51,7 @@ get_header();
 .wizard-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}.wiz{padding:8px 12px;border-radius:999px;background:#2f3340;color:#d0d5e4;border:1px solid #434a5b;cursor:pointer}.wiz.active{background:#9dd41a;color:#13151a;border-color:#9dd41a}
 .step{opacity:0;transform:translateY(10px);transition:.3s;max-height:0;overflow:hidden}.step.active{opacity:1;transform:none;max-height:2200px}
 .step input,.step select{display:block;width:100%;max-width:620px;margin:8px 0;padding:12px;border:1px solid #4c5368;border-radius:12px;background:#1b1d24;color:#fff}
-.pkgcomp{margin-top:6px;color:#cfd7ea;font-size:13px}.pkgrates{margin-top:8px;font-size:13px;line-height:1.5;color:#e7edf9}.pkgsel{margin-top:8px;padding:6px;border:1px solid #55617a}.qty{display:flex;align-items:center;gap:8px;margin-top:10px}.qty button{width:32px;height:32px;line-height:32px;padding:0;border-radius:0;background:#9dd41a;color:#111;font-weight:800}.qval{min-width:24px;text-align:center;font-weight:700}.game-card{position:relative}.gtag{position:absolute;z-index:2;top:8px;left:8px;background:#19d8d2;color:#032;padding:4px 10px;font-size:12px}.gtitle{font-size:38px;font-weight:700}.bookbtn{background:#9dd41a;border:0;padding:8px 14px}.step-actions{display:flex;gap:8px;margin-top:10px}.step button,.vr-summary button,.bookbtn,.qty button{background:#9dd41a;border:0;border-radius:0;padding:10px 14px;color:#fff;font-weight:500;font-size:15px}.step .ghost,#toggleOrder,#collapseOrder{background:#2d3240;color:#fff}.step input,.step select,#finalPanel input{background:#1b1d24;border:1px solid #4c5368;color:#fff;border-radius:0}.sum{font-size:20px;margin:8px 0}#orderWrap li{list-style:none;border-bottom:1px dashed #4c5368;padding:6px 0}@media (max-width:700px){.vr-summary{position:fixed!important;left:0;right:0;bottom:0;top:auto!important;width:100%!important;margin:0!important;z-index:9999;border-radius:0!important}}
+.pkgcomp{margin-top:6px;color:#cfd7ea;font-size:13px}.pkgrates{margin-top:8px;font-size:13px;line-height:1.5;color:#e7edf9}.pkgsel{margin-top:8px;padding:6px;border:1px solid #55617a}.qty{display:flex;align-items:center;gap:8px;margin-top:10px}.qty button{width:32px;height:32px;line-height:32px;padding:0;border-radius:0;background:#9dd41a;color:#111;font-weight:800}.qval{min-width:24px;text-align:center;font-weight:700}.game-card{position:relative}.gtag{position:absolute;z-index:2;top:8px;left:8px;background:#19d8d2;color:#032;padding:4px 10px;font-size:12px}.gtitle{font-size:28px;font-weight:700}.durations{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.durbtn{background:#9dd41a;color:#111;padding:6px 10px;cursor:pointer}.bookbtn{background:#9dd41a;border:0;padding:8px 14px}.step-actions{display:flex;gap:8px;margin-top:10px}.step button,.vr-summary button,.bookbtn,.qty button{background:#9dd41a;border:0;border-radius:0;padding:10px 14px;color:#fff;font-weight:500;font-size:15px}.step .ghost,#toggleOrder,#collapseOrder{background:#2d3240;color:#fff}.step input,.step select,#finalPanel input{background:#1b1d24;border:1px solid #4c5368;color:#fff;border-radius:0}.sum{font-size:20px;margin:8px 0}#orderWrap li{list-style:none;border-bottom:1px dashed #4c5368;padding:6px 0}@media (max-width:700px){.vr-summary{position:fixed!important;left:0;right:0;bottom:0;top:auto!important;width:100%!important;margin:0!important;z-index:9999;border-radius:0!important}}
 @media (max-width:1100px){.vr-booking .container-xxl>.vr-summary{float:none;width:100%;margin:0 0 16px 0}.cards{grid-template-columns:1fr 1fr}}@media (max-width:700px){.cards{grid-template-columns:1fr}}
 </style>
 <script>
@@ -63,7 +63,7 @@ const PACKAGES=[
 const state={step:0};
 const games=[{name:"Magic",price:0,img:"https://vr-pandoroom.org/img/49736595_587_q70.webp",tag:"Вечеринка, 6+"},{name:"Zombie Vegas",price:0,img:"https://vr-pandoroom.org/img/49736607_587_q70.webp",tag:"Выживание, 16+"},{name:"Party 2",price:0,img:"https://vr-pandoroom.org/img/49736609_587_q70.webp",tag:"Вечеринка, 6+"},{name:"Horror",price:0,img:"https://vr-pandoroom.org/img/49736613_588_q70.webp",tag:"Ужасы, 18+"},{name:"Tactics",price:0,img:"https://vr-pandoroom.org/img/49736611_587_q70.webp",tag:"Тактический шутер, 16+"},{name:"Battle",price:0,img:"https://vr-pandoroom.org/img/49736617_588_q70.webp",tag:"Геройский шутер, 12+"},{name:"Zombies",price:0,img:"https://vr-pandoroom.org/img/49736625_588_q70.webp",tag:"Выживание, 16+"},{name:"Party Games",price:0,img:"https://vr-pandoroom.org/img/49736587_588_q70.webp",tag:"Вечеринка, 6+"}];
 const decor=<?php echo json_encode(array_values($decorItems), JSON_UNESCAPED_UNICODE); ?>;
-const food=<?php echo json_encode(array_values($foodItems), JSON_UNESCAPED_UNICODE); ?>;
+const food=[{name:'Сет «Стандарт»',price:5490,img:'',desc:'Пепперони, 4 сыра, ассорти фри, цезарь мини, фрукты + йогурт'},{name:'Сет «Пицца»',price:4290,img:'',desc:'Пепперони, 4 сыра, мясная, чикен чиз, кордон блю'},{name:'Сет «Оптимальный»',price:8990,img:'',desc:'Пепперони, 4 сыра, ассорти фри, цезарь, фрукты, круассан с лососем, шашлычки'},{name:'Сет «Фри»',price:7990,img:'',desc:'Картофель фри, дольки, наггетсы, пельмени, корндоги, осьминожки, сырный соус'},{name:'Сет «Максимальный»',price:16990,img:'',desc:'Сырная тарелка, шашлычки, оливье, цезарь, брускетты, ассорти фри, пиццы, роллы'},{name:'Сет «Фуршет»',price:9990,img:'',desc:'Сырная тарелка, шашлычки, оливье, цезарь, брускетты, роллы'}];
 const STEP_TITLES=['Дата и время','Пакет','Комната праздника','Игры','Украшения','Еда'];
 function goStep(n){
   state.step=n;
@@ -86,7 +86,7 @@ function renderCards(id,data,key){
     const n=x.name||x[0]; const p=x.price||x[1]||0; const img=x.img||'';
     const controls=(key==='food'||key==='decor')?`<div class="qty"><button class="qtym" data-k="${key}" data-i="${i}">−</button><span class="qval" id="q_${key}_${i}">0</span><button class="qtyp" data-k="${key}" data-i="${i}">+</button></div>`:'';
     if(key==='package'){const g=+document.getElementById('guests')?.value||8;const t=tier(g);const weekend=isWeekend(document.getElementById('date')?.value);const cur=(weekend?x.prices.we:x.prices.wd)[t];const comp=`<div class='pkgcomp'>Банкетная комната ${x.roomHours} ч и ${x.arenaHours}:50 игры</div><div class='pkgrates'><div>До 8: ${(weekend?x.prices.we[0]:x.prices.wd[0])} ₽</div><div>До 16: ${(weekend?x.prices.we[1]:x.prices.wd[1])} ₽</div><div>До 20: ${(weekend?x.prices.we[2]:x.prices.wd[2])} ₽</div></div><div class='pkgsel'>Ваша цена: <b>${cur} ₽</b></div>`; return `<div class='card' data-k='${key}' data-i='${i}'><div>${n}</div>${comp}</div>`;}
-    if(key==='game'){return `<div class='card game-card' data-k='${key}' data-i='${i}'>${img?`<div class='gtag'>${x.tag||''}</div><img src='${img}' style='width:100%;height:190px;object-fit:cover;margin-bottom:10px'>`:''}<div class='gtitle'>${n}</div><div class='step-actions'><button class='bookbtn'>Забронировать</button></div></div>`;} return `<div class='card' data-k='${key}' data-i='${i}'>${img?`<img src='${img}' style='width:100%;height:130px;object-fit:cover;margin-bottom:8px'>`:''}<div>${n}</div><div>${p} ₽</div>${controls}</div>`;
+    if(key==='game'){return `<div class='card game-card' data-k='${key}' data-i='${i}'>${img?`<div class='gtag'>${x.tag||''}</div><img class='gameimg' data-i='${i}' src='${img}' style='width:100%;height:190px;object-fit:cover;margin-bottom:10px'>`:''}<div class='gtitle'>${n}</div><div class='durations'><span class='durbtn' data-min='30' data-i='${i}'>30 мин</span><span class='durbtn' data-min='60' data-i='${i}'>60 мин</span><span class='durbtn' data-min='90' data-i='${i}'>90 мин</span><span class='durbtn' data-min='package' data-i='${i}'>Весь пакет</span></div></div>`;} return `<div class='card' data-k='${key}' data-i='${i}'>${img?`<img src='${img}' style='width:100%;height:130px;object-fit:cover;margin-bottom:8px'>`:''}<div>${n}</div><div>${p} ₽</div>${controls}</div>`;
   }).join('')
 }
 renderCards('packages',PACKAGES,'package');renderCards('games',games,'game');renderCards('decor',decor,'decor');renderCards('food',food,'food');
@@ -100,7 +100,7 @@ document.addEventListener('click',e=>{
   }
   const c=e.target.closest('.card');if(!c)return;const k=c.dataset.k,i=+c.dataset.i;
   if(k==='package'){ c.parentElement.querySelectorAll('.card').forEach(x=>x.classList.remove('active')); c.classList.add('active'); state.package=PACKAGES[i];const g=+document.getElementById('guests')?.value||8;const t=tier(g);state.packagePrice=(isWeekend(document.getElementById('date').value)?state.package.prices.we:state.package.prices.wd)[t];}
-  if(k==='game'){ state.game={}; state.game[i]=1; c.parentElement.querySelectorAll('.card').forEach(x=>x.classList.remove('active')); c.classList.add('active'); }
+  if(k==='game'){ c.classList.toggle('active'); state.game=state.game||{}; if(!state.game[i]) state.game[i]=1; }
   if(c.parentElement && c.parentElement.id==='tables'){ state.room={name:c.innerText.split('\n')[0]||'Комната'}; c.parentElement.querySelectorAll('.card').forEach(x=>x.classList.remove('active')); c.classList.add('active'); }
   upd();
 });
@@ -147,6 +147,20 @@ document.addEventListener('click',function(e){
  if(e.target.id==='toggleOrder'){ document.getElementById('orderWrap').style.display='block'; document.getElementById('collapseOrder').style.display='block'; }
  if(e.target.id==='collapseOrder'){ document.getElementById('orderWrap').style.display='none'; document.getElementById('collapseOrder').style.display='none'; }
  if(e.target.classList.contains('bookbtn')){ var card=e.target.closest('.card'); var i=card?card.dataset.i:null; if(i===null)return; var v=prompt('Время игры: 30, 60, 90 или package','package'); state.gameDur=state.gameDur||{}; state.gameDur[i]=v||'package'; }
+});
+
+
+document.addEventListener('click',function(e){
+ if(e.target.classList.contains('gameimg')){ const i=e.target.dataset.i; const g=games[i]; if(g) alert(g.name+'\n\n'+(g.desc||'Описание игры скоро добавим')); }
+ if(e.target.classList.contains('durbtn')){
+   const i=e.target.dataset.i; const val=e.target.dataset.min;
+   const packMin=((state.package?.arenaHours||0)*60)-10;
+   state.gameDur=state.gameDur||{};
+   state.gameDur[i]=(val==='package'?packMin:parseInt(val,10));
+   const sum=Object.values(state.gameDur).reduce((a,b)=>a+(+b||0),0);
+   if(sum>packMin){ alert('Превышено время игры по пакету'); delete state.gameDur[i]; return; }
+   e.target.parentElement.querySelectorAll('.durbtn').forEach(x=>x.style.outline='none'); e.target.style.outline='2px solid #fff';
+ }
 });
 
 </script>
