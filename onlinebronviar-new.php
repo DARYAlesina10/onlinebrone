@@ -28,15 +28,15 @@ if(!$decorItems){$decorItems=[['name'=>'Базовое украшение','pric
 get_header();
 ?>
 <section class="vr-booking container-fluid py-4"><div class="container-xxl">
-  <aside class="vr-summary" id="vrSummary"><h3>Ваш заказ</h3><ul id="summaryList"></ul><div class="sum">Итого: <b id="summaryTotal">0</b> ₽</div></aside>
+  <aside class="vr-summary" id="vrSummary"><h3>Ваш заказ</h3><ul id="summaryList"></ul><div class="sum">Итого: <b id="summaryTotal">0</b> ₽</div><div id="finalPanel" style="display:none"><input id="phone" placeholder="Телефон"><div class="step-actions"><button id="getCode" class="ghost">Получить SMS код</button></div><input id="smsCode" placeholder="Код из SMS"><button id="sendOrder">Отправить</button><button id="backToForm" class="ghost" style="margin-top:8px">Вернуться к заполнению</button></div></aside>
   <div class="vr-main">
     <h1>Онлайн-бронирование VR праздника</h1>
     <div class="wizard-nav" id="wizardNav"></div>
-    <div class="step" data-step="0"><h2>Дата и время праздника</h2><input type="date" id="date"><input type="time" id="time" step="1800"><button id="toStep1">Далее</button></div>
+    <div class="step" data-step="0"><h2>Дата, время и гости</h2><div class="row gx-2"><div class="col-md-4"><input type="date" id="date"></div><div class="col-md-4"><select id="time" class="form-select"></select></div><div class="col-md-4"><input id="guests" type="number" placeholder="Количество гостей"></div></div><div class="row gx-2"><div class="col-md-6"><input id="kidname" placeholder="Имя именинника"></div><div class="col-md-6"><input id="parent" placeholder="Имя родителя"></div></div><button id="toStep1">Далее</button></div>
     <div class="step" data-step="1" style="display:none"><h2>Выбор пакета</h2><div id="packages" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="0">Назад</button><button id="findArena">Показать свободные слоты</button></div></div>
     <div class="step" data-step="2" style="display:none"><h2>Комната праздника</h2><div id="slots"></div><div class="cards" id="tables"></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
-    <div class="step" data-step="3" style="display:none"><h2>Данные о гостях</h2><input id="guests" type="number" placeholder="Количество гостей"><input id="kidname" placeholder="Имя именинника"><input id="parent" placeholder="Имя родителя"><div class="step-actions"><button class="ghost prev" data-prev="2">Назад</button><button id="toStep4">Далее</button></div></div><div class="step" data-step="4" style="display:none"><h2>Выбор арены и игры</h2><div id="games" class="cards"></div></div>
-    <div class="step" data-step="5" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="4">Назад</button><button id="toStep6">Далее</button></div></div><div class="step" data-step="6" style="display:none"><h2>Еда</h2><div id="food" class="cards"></div></div>
+    <div class="step" data-step="3" style="display:none"><h2>Выбор арены и игры</h2><div id="games" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="2">Назад</button><button id="toStep4">Далее</button></div></div>
+    <div class="step" data-step="4" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="3">Назад</button><button id="toStep6">Далее</button></div></div><div class="step" data-step="5" style="display:none"><h2>Еда</h2><div id="food" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="4">Назад</button><button id="finishFlow">Завершить заполнение</button></div></div>
     
   </div>
 </div></section>
@@ -63,7 +63,7 @@ const state={step:0};
 const games=[{name:"Magic",price:0,img:"https://vr-pandoroom.org/img/49736595_587_q70.webp"},{name:"Zombie Vegas",price:0,img:"https://vr-pandoroom.org/img/49736607_587_q70.webp"},{name:"Party 2",price:0,img:"https://vr-pandoroom.org/img/49736609_587_q70.webp"},{name:"Horror",price:0,img:"https://vr-pandoroom.org/img/49736613_588_q70.webp"}];
 const decor=<?php echo json_encode(array_values($decorItems), JSON_UNESCAPED_UNICODE); ?>;
 const food=<?php echo json_encode(array_values($foodItems), JSON_UNESCAPED_UNICODE); ?>;
-const STEP_TITLES=['Дата и время','Пакет','Комната праздника','Гости','Игры','Украшения','Еда'];
+const STEP_TITLES=['Дата и время','Пакет','Комната праздника','Игры','Украшения','Еда'];
 function goStep(n){
   state.step=n;
   document.querySelectorAll('.step').forEach(el=>el.classList.remove('active'));
@@ -75,6 +75,7 @@ function buildNav(){
   const nav=document.getElementById('wizardNav');
   nav.innerHTML=STEP_TITLES.map((t,i)=>`<button class="wiz" data-go="${i}">${t}</button>`).join('');
 }
+const tsel=document.getElementById('time'); for(let h=10;h<=22;h++){['00','30'].forEach(m=>{if(h===22&&m==='30')return;const v=String(h).padStart(2,'0')+':'+m; tsel.insertAdjacentHTML('beforeend',`<option value='${v}'>${v}</option>`);});}
 buildNav();goStep(0);
 document.addEventListener('click',e=>{const g=e.target.closest('.wiz'); if(g){goStep(+g.dataset.go)} const p=e.target.closest('.prev'); if(p){goStep(+p.dataset.prev)}});
 
@@ -86,7 +87,7 @@ function renderCards(id,data,key){
   }).join('')
 }
 renderCards('packages',PACKAGES,'package');renderCards('games',games,'game');renderCards('decor',decor,'decor');renderCards('food',food,'food');
-function upd(){const list=[];let total=0;if(state.package){list.push('Пакет: '+state.package.name);total+=state.packagePrice||0} if(state.room){list.push('Комната: '+state.room.name);} ['game','decor','food'].forEach(k=>{Object.entries(state[k]||{}).forEach(([idx,qty])=>{const src=(k==='game'?games:k==='decor'?decor:food)[idx];if(!src)return;list.push((src.name||src[0])+' x'+qty);total+=(src.price||src[1]||0)*qty;});});document.getElementById('summaryList').innerHTML=list.map(x=>`<li>${x}</li>`).join('');document.getElementById('summaryTotal').innerText=total}
+function upd(){const list=[];let total=0;if(state.package){list.push('Пакет: '+state.package.name);total+=state.packagePrice||0} if(state.room){list.push('Комната: '+state.room.name);} ['game','decor','food'].forEach(k=>{Object.entries(state[k]||{}).forEach(([idx,qty])=>{const src=(k==='game'?games:k==='decor'?decor:food)[idx];if(!src)return;const unit=(src.price||src[1]||0);list.push((src.name||src[0])+' — '+unit+' ₽ x'+qty+' = '+(unit*qty)+' ₽');total+=unit*qty;});});document.getElementById('summaryList').innerHTML=list.map(x=>`<li>${x}</li>`).join('');document.getElementById('summaryTotal').innerText=total}
 function tier(g){return g<=8?0:g<=16?1:2}
 function isWeekend(d){const x=new Date(d);const day=x.getDay();return day===0||day===6}
 
@@ -127,8 +128,12 @@ document.getElementById('findArena').onclick=()=>{
   goStep(2);
 };
 
-document.getElementById('toStep4').onclick=()=>{document.querySelector('[data-step="4"]').style.display='block';document.querySelector('[data-step="5"]').style.display='block';goStep(4);upd();}
-document.getElementById('toStep6').onclick=()=>{document.querySelector('[data-step="6"]').style.display='block';goStep(6);upd();}
+document.getElementById('toStep4').onclick=()=>{document.querySelector('[data-step="4"]').style.display='block';goStep(4);upd();}
+document.getElementById('toStep6').onclick=()=>{document.querySelector('[data-step="5"]').style.display='block';goStep(5);upd();}
+document.getElementById('finishFlow').onclick=()=>{document.querySelector('.vr-main').style.transition='opacity .4s';document.querySelector('.vr-main').style.opacity='0';setTimeout(()=>{document.querySelector('.vr-main').style.display='none';document.getElementById('finalPanel').style.display='block';},350);}
+document.getElementById('backToForm').onclick=()=>{document.querySelector('.vr-main').style.display='block';setTimeout(()=>{document.querySelector('.vr-main').style.opacity='1';},20);document.getElementById('finalPanel').style.display='none';}
+document.getElementById('getCode').onclick=()=>alert('SMS код отправлен (демо)');
+document.getElementById('sendOrder').onclick=()=>alert('Заявка отправлена!');
 
 
 </script>
