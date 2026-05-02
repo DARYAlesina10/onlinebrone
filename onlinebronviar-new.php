@@ -108,6 +108,14 @@ document.addEventListener('click',e=>{
 document.getElementById('toStep1').onclick=()=>goStep(1);
 document.getElementById('toStep3').onclick=()=>{document.querySelector('[data-step="3"]').style.display='block';goStep(3);upd();}
 
+function renderAltOptions(d){
+  const base=new Date(d); const options=[];
+  for(let dd=0;dd<14;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){options.push({ds,ti,weekend:(dt.getDay()==0||dt.getDay()==6)});});}
+  const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; let alt='';
+  options.slice(0,11).forEach(function(o){const pr=pk?(o.weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=o.weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const promo=o.weekend?'':'<div style=\"font-size:12px;color:#9dd41a\">Лови выгоду</div>'; alt += '<button class=\"ghost altTime\" data-date=\"'+o.ds+'\" data-time=\"'+o.ti+'\" style=\"margin:4px;'+st+'\">'+o.ds+' '+o.ti+' — '+pr+' ₽'+promo+'</button>';});
+  return '<div class=\"card\">Нет свободных столов. Измените дату/время:</div>'+alt;
+}
+
 document.getElementById('findArena').onclick=()=>{
   const d=document.getElementById('date').value;
   const t=document.getElementById('time').value;
@@ -124,9 +132,9 @@ document.getElementById('findArena').onclick=()=>{
     let arr=[];
     try{arr=JSON.parse(txt);}catch(e){arr=[];} if(arr && !Array.isArray(arr) && typeof arr==='object'){arr=Object.values(arr);} 
     const box=document.getElementById('tables');
-    if(!Array.isArray(arr)||!arr.length){let alt=''; const base=new Date(d); let c=0; for(let dd=0;dd<14 && c<11;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){ if(c>=11)return; const weekend=(dt.getDay()==0||dt.getDay()==6); const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; const pr=pk?(weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const txt=!weekend?('Лови выгоду Цена пакета "'+(pk?pk.name:'')+'" - '+pr+' ₽'):(ds+' '+ti+' — '+pr+' ₽'); alt += '<button class=\"ghost altTime\" data-date=\"'+ds+'\" data-time=\"'+ti+'\" style=\"margin:4px;'+st+'\">'+txt+'</button>'; c++;}); } box.innerHTML='<div class=\"card\">Нет свободных столов. Измените дату/время:</div>'+alt;return;}
+    if(!Array.isArray(arr)||!arr.length){let alt=''; const base=new Date(d); let c=0; for(let dd=0;dd<14 && c<11;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){ if(c>=11)return; const weekend=(dt.getDay()==0||dt.getDay()==6); const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; const pr=pk?(weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const txt=!weekend?('Лови выгоду Цена пакета "'+(pk?pk.name:'')+'" - '+pr+' ₽'):(ds+' '+ti+' — '+pr+' ₽'); alt += '<button class=\"ghost altTime\" data-date=\"'+ds+'\" data-time=\"'+ti+'\" style=\"margin:4px;'+st+'\">'+txt+'</button>'; c++;}); } box.innerHTML=renderAltOptions(d); return;}
     arr=arr.filter(it=>String(it.zal)==='4'||String(it.zal).toLowerCase()==='viar'); if(!arr.length){let alt=''; const base=new Date(d); const options=[]; for(let dd=0;dd<14;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){options.push({ds,ti,weekend:(dt.getDay()==0||dt.getDay()==6)});});} const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; options.slice(0,11).forEach(function(o){const pr=pk?(o.weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=o.weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const promo=o.weekend?'':'<div style=\"font-size:12px;color:#9dd41a\">Лови выгоду</div>'; alt += '<button class=\"ghost altTime\" data-date=\"'+o.ds+'\" data-time=\"'+o.ti+'\" style=\"margin:4px;'+st+'\">'+o.ds+' '+o.ti+' — '+pr+' ₽'+promo+'</button>';}); box.innerHTML='<div class="card">Нет свободных столов. Измените дату/время:</div>'+alt; return;} box.innerHTML=arr.map(it=>`<div class="card" data-table="${it.id||''}">${it.kar?`<img src='${it.kar}' style='width:100%;height:120px;object-fit:cover;margin-bottom:8px'>`:''}<div><b>Зал 4 (VR Arena)</b></div><div>Стол ${it.stol||''}</div><div>Вместимость: ${it.vm||'-'}</div><div>${it.op||''}</div></div>`).join('');
-  });
+  }).catch(function(){document.getElementById('tables').innerHTML=renderAltOptions(d);});
 
   document.querySelector('[data-step="2"]').style.display='block';
   goStep(2);
