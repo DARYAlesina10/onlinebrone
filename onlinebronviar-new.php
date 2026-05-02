@@ -34,7 +34,7 @@ get_header();
     <div class="wizard-nav" id="wizardNav"></div>
     <div class="step" data-step="0"><h2>Дата, время и гости</h2><div class="row gx-2"><div class="col-md-4"><input type="date" id="date"></div><div class="col-md-4"><select id="time" class="form-select"></select></div><div class="col-md-4"><input id="guests" type="number" placeholder="Количество гостей"></div></div><div class="row gx-2"><div class="col-md-6"><input id="kidname" placeholder="Имя именинника"></div><div class="col-md-6"><input id="parent" placeholder="Имя родителя"></div></div><button id="toStep1">Далее</button></div>
     <div class="step" data-step="1" style="display:none"><h2>Выбор пакета</h2><div id="packages" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="0">Назад</button><button id="findArena">Показать свободные слоты</button></div></div>
-    <div class="step" data-step="2" style="display:none"><h2>Комната праздника</h2><div id="slots"></div><div class="cards" id="tables"></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
+    <div class="step" data-step="2" style="display:none"><h2>Комната праздника</h2><div id="slots"></div><div class="cards" id="tables"></div><div id="altQuick" class="cards" style="margin-top:12px"></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
     <div class="step" data-step="3" style="display:none"><h2>Выбор арены и игры</h2><div id="gameRemain" class="pkgsel" style="margin-bottom:10px">Остаток времени игры: —</div><div id="games" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="2">Назад</button><button id="toStep4">Далее</button></div></div>
     <div class="step" data-step="4" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="3">Назад</button><button id="toStep6">Далее</button></div></div>
     <div class="step" data-step="5" style="display:none"><h2>Еда</h2><div id="food" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="4">Назад</button><button id="finishFlow" type="button">Завершить заполнение</button></div></div>
@@ -108,6 +108,21 @@ document.addEventListener('click',e=>{
 document.getElementById('toStep1').onclick=()=>goStep(1);
 document.getElementById('toStep3').onclick=()=>{document.querySelector('[data-step="3"]').style.display='block';goStep(3);upd();}
 
+function isFreeTable(it){
+  if(it==null || typeof it!=='object') return false;
+  if('free' in it) return String(it.free)==='1' || it.free===true;
+  if('isFree' in it) return !!it.isFree;
+  if('busy' in it) return !(it.busy===true || String(it.busy)==='1');
+  if('reserved' in it) return !(it.reserved===true || String(it.reserved)==='1');
+  return true;
+}
+function renderQuickAlt(d){
+  const base=new Date(d); const options=[];
+  for(let dd=0;dd<7;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(ti=>options.push({ds,ti,weekend:(dt.getDay()==0||dt.getDay()==6)}));}
+  const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package;
+  return options.slice(0,5).map(function(o){const pr=pk?(o.weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=o.weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; return '<button class=\"ghost altTime\" data-date=\"'+o.ds+'\" data-time=\"'+o.ti+'\" style=\"margin:4px;'+st+'\">'+o.ds+' '+o.ti+' — '+pr+' ₽</button>';}).join('');
+}
+
 function renderAltOptions(d){
   const base=new Date(d); const options=[];
   for(let dd=0;dd<14;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){options.push({ds,ti,weekend:(dt.getDay()==0||dt.getDay()==6)});});}
@@ -133,10 +148,11 @@ document.getElementById('findArena').onclick=()=>{
     try{arr=JSON.parse(txt);}catch(e){arr=[];} if(arr && !Array.isArray(arr) && typeof arr==='object'){arr=Object.values(arr);} 
     const box=document.getElementById('tables');
     if(!Array.isArray(arr)||!arr.length){let alt=''; const base=new Date(d); let c=0; for(let dd=0;dd<14 && c<11;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){ if(c>=11)return; const weekend=(dt.getDay()==0||dt.getDay()==6); const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; const pr=pk?(weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const txt=!weekend?('Лови выгоду Цена пакета "'+(pk?pk.name:'')+'" - '+pr+' ₽'):(ds+' '+ti+' — '+pr+' ₽'); alt += '<button class=\"ghost altTime\" data-date=\"'+ds+'\" data-time=\"'+ti+'\" style=\"margin:4px;'+st+'\">'+txt+'</button>'; c++;}); } box.innerHTML=renderAltOptions(d); return;}
-    arr=arr.filter(it=>String(it.zal)==='4'||String(it.zal).toLowerCase()==='viar'); if(!arr.length){let alt=''; const base=new Date(d); const options=[]; for(let dd=0;dd<14;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){options.push({ds,ti,weekend:(dt.getDay()==0||dt.getDay()==6)});});} const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; options.slice(0,11).forEach(function(o){const pr=pk?(o.weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=o.weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const promo=o.weekend?'':'<div style=\"font-size:12px;color:#9dd41a\">Лови выгоду</div>'; alt += '<button class=\"ghost altTime\" data-date=\"'+o.ds+'\" data-time=\"'+o.ti+'\" style=\"margin:4px;'+st+'\">'+o.ds+' '+o.ti+' — '+pr+' ₽'+promo+'</button>';}); box.innerHTML='<div class="card">Нет свободных столов. Измените дату/время:</div>'+alt; return;} box.innerHTML=arr.map(it=>`<div class="card" data-table="${it.id||''}">${it.kar?`<img src='${it.kar}' style='width:100%;height:120px;object-fit:cover;margin-bottom:8px'>`:''}<div><b>Зал 4 (VR Arena)</b></div><div>Стол ${it.stol||''}</div><div>Вместимость: ${it.vm||'-'}</div><div>${it.op||''}</div></div>`).join('');
-  }).catch(function(){document.getElementById('tables').innerHTML=renderAltOptions(d);});
+    arr=arr.filter(it=>(String(it.zal)==='4'||String(it.zal).toLowerCase()==='viar') && isFreeTable(it)); if(!arr.length){let alt=''; const base=new Date(d); const options=[]; for(let dd=0;dd<14;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){options.push({ds,ti,weekend:(dt.getDay()==0||dt.getDay()==6)});});} const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; options.slice(0,11).forEach(function(o){const pr=pk?(o.weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=o.weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const promo=o.weekend?'':'<div style=\"font-size:12px;color:#9dd41a\">Лови выгоду</div>'; alt += '<button class=\"ghost altTime\" data-date=\"'+o.ds+'\" data-time=\"'+o.ti+'\" style=\"margin:4px;'+st+'\">'+o.ds+' '+o.ti+' — '+pr+' ₽'+promo+'</button>';}); box.innerHTML='<div class="card">Нет свободных столов. Измените дату/время:</div>'+alt; return;} box.innerHTML=arr.map(it=>`<div class="card" data-table="${it.id||''}">${it.kar?`<img src='${it.kar}' style='width:100%;height:120px;object-fit:cover;margin-bottom:8px'>`:''}<div><b>Зал 4 (VR Arena)</b></div><div>Стол ${it.stol||''}</div><div>Вместимость: ${it.vm||'-'}</div><div>${it.op||''}</div></div>`).join('');
+  }).catch(function(){document.getElementById('tables').innerHTML=renderAltOptions(d); document.getElementById('altQuick').innerHTML=renderQuickAlt(d);});
 
   document.querySelector('[data-step="2"]').style.display='block';
+  document.getElementById('altQuick').innerHTML=renderQuickAlt(d);
   goStep(2);
 };
 
