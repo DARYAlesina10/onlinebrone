@@ -1,0 +1,195 @@
+<?php
+/*
+Template name: виар онлайн брони NEW
+*/
+$foodItems=[];
+$decorItems=[];
+try {
+  $login=json_encode(['apiLogin'=>'3e2a8252692647d9a40bb92e194dd7ea']);
+  $ch=curl_init('https://api-ru.iiko.services/api/1/access_token');
+  curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>1,CURLOPT_POST=>1,CURLOPT_HTTPHEADER=>['Content-Type: application/json'],CURLOPT_POSTFIELDS=>$login]);
+  $tokenResp=json_decode(curl_exec($ch),true); curl_close($ch);
+  if(!empty($tokenResp['token'])){
+    $payload=json_encode(['startRevision'=>1,'organizationId'=>'0d11942d-de93-4be2-ae24-752307cc186b']);
+    $ch=curl_init('https://api-ru.iiko.services/api/1/nomenclature');
+    curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>1,CURLOPT_POST=>1,CURLOPT_HTTPHEADER=>['Content-Type: application/json','Authorization: Bearer '.$tokenResp['token']],CURLOPT_POSTFIELDS=>$payload]);
+    $nom=json_decode(curl_exec($ch),true); curl_close($ch);
+    $foodGroups=['f54fb156-fe31-4824-ba31-fe38b8c6d7cb','33ab134e-2ca1-49d2-b4e6-ee0b8d562871','608c883e-7678-4fa8-9ef1-e127ea8877f2','89ae1b8f-c8b9-4099-be4e-52a233a287a8','767fa1a8-4578-499e-ad5b-a3d0dc6ba11f','bebbdf8e-31e8-4c60-bc46-8da01e6615ac'];
+    $decorGroups=['81aa3f1c-86ff-40d0-b930-b556e2055934','97fd7bd1-5cd4-43d9-9409-429781209481','d1bff5fd-89aa-4122-8b57-341249d0b55e'];
+    foreach(($nom['products']??[]) as $pr){
+      $price=$pr['sizePrices'][0]['price']['currentPrice']??0;
+      if(in_array($pr['parentGroup']??'', $foodGroups,true)) $foodItems[]=['name'=>($pr['name']??'Товар'),'price'=>(int)$price,'img'=>($pr['imageLinks'][0]??'')];
+      if(in_array($pr['parentGroup']??'', $decorGroups,true)) $decorItems[]=['name'=>($pr['name']??'Украшение'),'price'=>(int)$price,'img'=>($pr['imageLinks'][0]??'')];
+    }
+  }
+}catch(Throwable $e){}
+if(!$foodItems){$foodItems=[['name'=>'Сет праздничный','price'=>5500,'img'=>''],['name'=>'Напитки','price'=>2500,'img'=>''],['name'=>'Торт','price'=>4000,'img'=>'']];}
+if(!$decorItems){$decorItems=[['name'=>'Базовое украшение','price'=>4500,'img'=>''],['name'=>'Премиум украшение','price'=>9000,'img'=>'']];}
+get_header();
+?>
+<section class="vr-booking container-fluid py-4"><div class="container-xxl">
+  <aside class="vr-summary" id="vrSummary"><button id="toggleOrder" type="button" class="ghost" style="width:100%;margin-bottom:8px">Ваш заказ</button><button id="collapseOrder" type="button" class="ghost" style="width:100%;margin-bottom:8px;display:none">Свернуть список</button><div id="orderWrap" style="display:block"><ul id="summaryList"></ul></div><div class="sum">Итого: <b id="summaryTotal">0</b> ₽</div><button id="finishFlowSide" type="button" class="ghost" style="width:100%;margin:8px 0">Завершить заполнение</button><div id="finalPanel" style="display:none"><input id="phone" placeholder="Телефон"><div class="step-actions"><button id="getCode" class="ghost">Получить SMS код</button></div><input id="smsCode" placeholder="Код из SMS"><button id="sendOrder">Отправить</button><button id="backToForm" class="ghost" style="margin-top:8px">Вернуться к заполнению</button></div></aside>
+  <div class="vr-main">
+    
+    <div class="wizard-nav" id="wizardNav"></div>
+    <div class="step" data-step="0"><h2>Дата, время и гости</h2><div class="row gx-2"><div class="col-md-4"><input type="date" id="date"></div><div class="col-md-4"><select id="time" class="form-select"></select></div><div class="col-md-4"><input id="guests" type="number" placeholder="Количество гостей"></div></div><div class="row gx-2"><div class="col-md-6"><input id="kidname" placeholder="Имя именинника"></div><div class="col-md-6"><input id="parent" placeholder="Имя родителя"></div></div><button id="toStep1">Далее</button></div>
+    <div class="step" data-step="1" style="display:none"><h2>Выбор пакета</h2><div id="packages" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="0">Назад</button><button id="findArena">Показать свободные слоты</button></div></div>
+    <div class="step" data-step="2" style="display:none"><h2>Комната праздника</h2><div id="slots"></div><div class="cards" id="tables"></div><div id="altQuick" class="cards" style="margin-top:12px"></div><div class="step-actions"><button class="ghost prev" data-prev="1">Назад</button><button id="toStep3">Далее</button></div></div>
+    <div class="step" data-step="3" style="display:none"><h2>Выбор арены и игры</h2><div id="gameRemain" class="pkgsel" style="margin-bottom:10px">Остаток времени игры: —</div><div id="games" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="2">Назад</button><button id="toStep4">Далее</button></div></div>
+    <div class="step" data-step="4" style="display:none"><h2>Украшения</h2><div id="decor" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="3">Назад</button><button id="toStep6">Далее</button></div></div>
+    <div class="step" data-step="5" style="display:none"><h2>Еда</h2><div id="food" class="cards"></div><div class="step-actions"><button class="ghost prev" data-prev="4">Назад</button><button id="finishFlow" type="button">Завершить заполнение</button></div></div>
+    
+  </div>
+</div></section>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap");
+.vr-booking{font-family:Montserrat,sans-serif;background:#17181d;color:#fff;min-height:100vh}.vr-booking .container-xxl{max-width:1400px}
+.vr-booking .vr-main{background:#22242b;border:1px solid #353945;padding:28px;border-radius:18px}
+.vr-booking .vr-summary{position:sticky;top:20px;height:fit-content;background:#1f2128;border:1px solid #393d4c;color:#fff;padding:18px;border-radius:16px}
+.vr-booking{display:block}.vr-booking .container-xxl>.vr-summary{float:right;width:340px;margin-left:20px}.vr-booking .container-xxl>.vr-main{overflow:hidden}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{background:#2b2e37!important;border:1px solid #464b5c;border-radius:14px;padding:14px;cursor:pointer;color:#fff!important}.card *{color:#fff!important}.card.active{border-color:#9dd41a;box-shadow:0 0 0 2px #9dd41a40}
+.wizard-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}.wiz{padding:8px 12px;border-radius:999px;background:#2f3340;color:#d0d5e4;border:1px solid #434a5b;cursor:pointer}.wiz.active{background:#9dd41a;color:#13151a;border-color:#9dd41a}
+.step{opacity:0;transform:translateY(10px);transition:.3s;max-height:0;overflow:hidden}.step.active{opacity:1;transform:none;max-height:2200px}
+.step input,.step select{display:block;width:100%;max-width:620px;margin:8px 0;padding:12px;border:1px solid #4c5368;border-radius:12px;background:#1b1d24;color:#fff}
+.pkgcomp{margin-top:6px;color:#cfd7ea;font-size:13px}.pkgrates{margin-top:8px;font-size:13px;line-height:1.5;color:#e7edf9}.pkgsel{margin-top:8px;padding:6px;border:1px solid #55617a}.qty{display:flex;align-items:center;gap:8px;margin-top:10px}.qty button{width:32px;height:32px;line-height:32px;padding:0;border-radius:0;background:#9dd41a;color:#111;font-weight:800}.qval{min-width:24px;text-align:center;font-weight:700}.game-card{position:relative}.gtag{position:absolute;z-index:2;top:8px;left:8px;background:#19d8d2;color:#032;padding:4px 10px;font-size:12px}.gtitle{font-size:28px;font-weight:700}.durations{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.durbtn{background:#9dd41a;color:#111;padding:6px 10px;cursor:pointer}.bookbtn{background:#9dd41a;border:0;padding:8px 14px}.step-actions{display:flex;gap:8px;margin-top:10px}.step button,.vr-summary button,.bookbtn,.qty button{--bgColor: #99c31c; --bgShadow: 0px 0px 10px 0px #99c31c; --underlineBorder: 1px; --underlineColor: var(--currentColor); --fontSize: 18px; --lineHeight: 1.37;background:var(--bgColor);box-shadow:var(--bgShadow);border:0;border-radius:0;padding:10px 14px;color:#fff;font-weight:500;font-size:var(--fontSize);line-height:var(--lineHeight)}.step .ghost,#toggleOrder,#collapseOrder{background:#2d3240;color:#fff}.step input,.step select,#finalPanel input{background:#1b1d24;border:1px solid #4c5368;color:#fff;border-radius:0}.sum{font-size:20px;margin:8px 0}#orderWrap li{list-style:none;border-bottom:1px dashed #4c5368;padding:6px 0}@media (max-width:700px){#orderWrap{display:none}.vr-summary{position:fixed!important;left:0;right:0;bottom:0;top:auto!important;width:100%!important;margin:0!important;z-index:9999;border-radius:0!important}}
+@media (max-width:1100px){.vr-booking .container-xxl>.vr-summary{float:none;width:100%;margin:0 0 16px 0}.cards{grid-template-columns:1fr 1fr}}@media (max-width:700px){.cards{grid-template-columns:1fr}}
+</style>
+<script>
+const PACKAGES=[
+{name:'Мини',roomHours:2,arenaHours:1,arenaMin:110,prices:{wd:[16000,22000,26000],we:[22000,28000,32000]}},
+{name:'Стандарт',roomHours:3,arenaHours:2,arenaMin:170,prices:{wd:[20000,26000,30000],we:[30000,36000,40000]}},
+{name:'Макс',roomHours:4,arenaHours:3,arenaMin:230,prices:{wd:[26000,32000,36000],we:[36000,42000,46000]}}
+];
+const state={step:0};
+const games=[{name:"Magic",price:0,img:"https://vr-pandoroom.org/img/49736595_587_q70.webp",tag:"Вечеринка, 6+"},{name:"Zombie Vegas",price:0,img:"https://vr-pandoroom.org/img/49736607_587_q70.webp",tag:"Выживание, 16+"},{name:"Party 2",price:0,img:"https://vr-pandoroom.org/img/49736609_587_q70.webp",tag:"Вечеринка, 6+"},{name:"Horror",price:0,img:"https://vr-pandoroom.org/img/49736613_588_q70.webp",tag:"Ужасы, 18+"},{name:"Tactics",price:0,img:"https://vr-pandoroom.org/img/49736611_587_q70.webp",tag:"Тактический шутер, 16+"},{name:"Battle",price:0,img:"https://vr-pandoroom.org/img/49736617_588_q70.webp",tag:"Геройский шутер, 12+"},{name:"Zombies",price:0,img:"https://vr-pandoroom.org/img/49736625_588_q70.webp",tag:"Выживание, 16+"},{name:"Party Games",price:0,img:"https://vr-pandoroom.org/img/49736587_588_q70.webp",tag:"Вечеринка, 6+"}];
+const decor=<?php echo json_encode(array_values($decorItems), JSON_UNESCAPED_UNICODE); ?>;
+const food=[{name:'Сет «Стандарт»',price:5490,img:'https://vr-pandoroom.org/img/50010013_344_q70.webp',desc:'Пепперони, 4 сыра, ассорти фри, цезарь, фрукты'},{name:'Сет «Пицца»',price:4290,img:'https://vr-pandoroom.org/img/50010019_519_q70.webp',desc:'Пепперони, 4 сыра, мясная, чикен чиз, кордон блю'},{name:'Сет «Оптимальный»',price:8990,img:'https://vr-pandoroom.org/img/49836623_402_q70.webp',desc:'Пепперони, 4 сыра, ассорти фри, цезарь, фрукты, шашлычки'},{name:'Сет «Фри»',price:7990,img:'https://vr-pandoroom.org/img/49742469_150_q70.webp',desc:'Фри, дольки, наггетсы, пельмени, корндоги, соусы'}];
+const STEP_TITLES=['Дата и время','Пакет','Комната праздника','Игры','Украшения','Еда'];
+function goStep(n){
+  state.step=n;
+  document.querySelectorAll('.step').forEach(el=>el.classList.remove('active'));
+  const target=document.querySelector('.step[data-step="'+n+'"]');
+  if(target){target.style.display='block';target.classList.add('active');}
+  document.querySelectorAll('.wiz').forEach((w,i)=>w.classList.toggle('active',i===n));
+}
+function buildNav(){
+  const nav=document.getElementById('wizardNav');
+  nav.innerHTML=STEP_TITLES.map((t,i)=>`<button class="wiz" data-go="${i}">${t}</button>`).join('');
+}
+const tsel=document.getElementById('time'); for(let h=10;h<=22;h++){['00','30'].forEach(m=>{if(h===22&&m==='30')return;const v=String(h).padStart(2,'0')+':'+m; tsel.insertAdjacentHTML('beforeend',`<option value='${v}'>${v}</option>`);});}
+buildNav();goStep(0);
+['date','guests'].forEach(id=>document.getElementById(id)?.addEventListener('change',()=>renderCards('packages',PACKAGES,'package')));
+document.addEventListener('click',e=>{const g=e.target.closest('.wiz'); if(g){goStep(+g.dataset.go)} const p=e.target.closest('.prev'); if(p){goStep(+p.dataset.prev)}});
+
+function renderCards(id,data,key){
+  document.getElementById(id).innerHTML=data.map((x,i)=>{
+    const n=x.name||x[0]; const p=x.price||x[1]||0; const img=x.img||'';
+    const controls=(key==='food'||key==='decor')?`<div class="qty"><button class="qtym" data-k="${key}" data-i="${i}">−</button><span class="qval" id="q_${key}_${i}">0</span><button class="qtyp" data-k="${key}" data-i="${i}">+</button></div>`:'';
+    if(key==='package'){const g=+document.getElementById('guests')?.value||8;const t=tier(g);const weekend=isWeekend(document.getElementById('date')?.value);const cur=(weekend?x.prices.we:x.prices.wd)[t];const cheaper=(x.prices.wd[t] < x.prices.we[t]); const comp=`<div class='pkgcomp'>Банкетная комната ${x.roomHours} ч и ${x.arenaHours}:50 игры</div><div class='pkgrates'><div>До 8: ${(weekend?x.prices.we[0]:x.prices.wd[0])} ₽</div><div>До 16: ${(weekend?x.prices.we[1]:x.prices.wd[1])} ₽</div><div>До 20: ${(weekend?x.prices.we[2]:x.prices.wd[2])} ₽</div></div><div class='pkgsel'>Ваша цена: <b>${cur} ₽</b></div>`; return `<div class='card' data-k='${key}' data-i='${i}'><div>${n}</div>${comp}</div>`;}
+    if(key==='game'){return `<div class='card game-card' data-k='${key}' data-i='${i}'>${img?`<div class='gtag'>${x.tag||''}</div><img class='gameimg' data-i='${i}' src='${img}' style='width:100%;height:190px;object-fit:cover;margin-bottom:10px'>`:''}<div class='gtitle'>${n}</div><div class='durations'><span class='durbtn' data-min='30' data-i='${i}'>30 мин</span><span class='durbtn' data-min='60' data-i='${i}'>60 мин</span><span class='durbtn' data-min='90' data-i='${i}'>90 мин</span><span class='durbtn' data-min='package' data-i='${i}'>Весь пакет</span></div></div>`;} return `<div class='card' data-k='${key}' data-i='${i}'>${img?`<img src='${img}' style='width:100%;height:130px;object-fit:cover;margin-bottom:8px'>`:''}<div>${n}</div><div>${p} ₽</div>${x.desc?`<div style='font-size:12px;color:#cfd7ea;margin-top:6px'>${x.desc}</div>`:''}${controls}</div>`;
+  }).join('')
+}
+renderCards('packages',PACKAGES,'package');renderCards('games',games,'game');renderCards('decor',decor,'decor');renderCards('food',food,'food');
+function upd(){const list=[];let total=0;if(state.selDate && state.selTime){list.push('Дата/время: '+state.selDate+' '+state.selTime);} if(state.package){list.push('Пакет: '+state.package.name);total+=state.packagePrice||0} if(state.room){list.push('Комната: '+state.room.name);} if(state.gameDur){Object.entries(state.gameDur).forEach(([gi,m])=>{const g=games[gi]; if(g) list.push('Игра: '+g.name+' — '+m+' мин');});} ['game','decor','food'].forEach(k=>{Object.entries(state[k]||{}).forEach(([idx,qty])=>{const src=(k==='game'?games:k==='decor'?decor:food)[idx];if(!src)return;const unit=(src.price||src[1]||0);list.push((src.name||src[0])+' — '+unit+' ₽ x'+qty+' = '+(unit*qty)+' ₽');total+=unit*qty;});});document.getElementById('summaryList').innerHTML=list.map(x=>`<li>${x}</li>`).join('');document.getElementById('summaryTotal').innerText=total}
+function tier(g){return g<=8?0:g<=16?1:2}
+function isWeekend(d){const x=new Date(d);const day=x.getDay();return day===0||day===6}
+
+document.addEventListener('click',e=>{
+  if(e.target.classList.contains('qtyp')||e.target.classList.contains('qtym')){
+    const k=e.target.dataset.k,i=e.target.dataset.i; state[k]=state[k]||{}; state[k][i]=(state[k][i]||0)+(e.target.classList.contains('qtyp')?1:-1); if(state[k][i]<0)state[k][i]=0; document.getElementById(`q_${k}_${i}`).innerText=state[k][i]; upd(); return;
+  }
+  const c=e.target.closest('.card');if(!c)return;const k=c.dataset.k,i=+c.dataset.i;
+  if(k==='package'){ c.parentElement.querySelectorAll('.card').forEach(x=>x.classList.remove('active')); c.classList.add('active'); state.package=PACKAGES[i];const g=+document.getElementById('guests')?.value||8;const t=tier(g);state.packagePrice=(isWeekend(document.getElementById('date').value)?state.package.prices.we:state.package.prices.wd)[t];}
+  if(k==='game'){ c.classList.toggle('active'); state.game=state.game||{}; if(!state.game[i]) state.game[i]=1; }
+  if(c.parentElement && c.parentElement.id==='tables'){ state.room={name:c.innerText.split('\n')[0]||'Комната'}; c.parentElement.querySelectorAll('.card').forEach(x=>x.classList.remove('active')); c.classList.add('active'); }
+  upd();
+});
+
+document.getElementById('toStep1').onclick=()=>goStep(1);
+document.getElementById('toStep3').onclick=()=>{document.querySelector('[data-step="3"]').style.display='block';goStep(3);upd();}
+
+function isFreeTable(it){
+  if(it==null || typeof it!=='object') return false;
+  const hasStatus=('free' in it)||('isFree' in it)||('busy' in it)||('reserved' in it);
+  if(!hasStatus) return true;
+  if('free' in it) return String(it.free)==='1' || it.free===true || String(it.free).toLowerCase()==='true';
+  if('isFree' in it) return it.isFree===true || String(it.isFree).toLowerCase()==='true';
+  if('busy' in it) return !(it.busy===true || String(it.busy)==='1' || String(it.busy).toLowerCase()==='true');
+  if('reserved' in it) return !(it.reserved===true || String(it.reserved)==='1' || String(it.reserved).toLowerCase()==='true');
+  return true;
+}
+function renderQuickAlt(d){
+  const base=new Date(d); const options=[];
+  for(let dd=0;dd<7;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(ti=>options.push({ds,ti,weekend:(dt.getDay()==0||dt.getDay()==6)}));}
+  const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package;
+  return options.slice(0,5).map(function(o){const pr=pk?(o.weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=o.weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; return '<button class=\"ghost altTime\" data-date=\"'+o.ds+'\" data-time=\"'+o.ti+'\" style=\"margin:4px;'+st+'\">'+o.ds+' '+o.ti+' — '+pr+' ₽</button>';}).join('');
+}
+
+function renderAltOptions(d){
+  const base=new Date(d); const options=[];
+  for(let dd=0;dd<14;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){options.push({ds,ti,weekend:(dt.getDay()==0||dt.getDay()==6)});});}
+  const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; let alt='';
+  options.slice(0,11).forEach(function(o){const pr=pk?(o.weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=o.weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const promo=o.weekend?'':'<div style=\"font-size:12px;color:#9dd41a\">Лови выгоду</div>'; alt += '<button class=\"ghost altTime\" data-date=\"'+o.ds+'\" data-time=\"'+o.ti+'\" style=\"margin:4px;'+st+'\">'+o.ds+' '+o.ti+' — '+pr+' ₽'+promo+'</button>';});
+  return '<div class=\"card\">Нет свободных столов. Измените дату/время:</div>'+alt;
+}
+
+document.getElementById('findArena').onclick=()=>{
+  const d=document.getElementById('date').value;
+  const t=document.getElementById('time').value;
+  state.selDate=d; state.selTime=t;
+  if(!state.package||!d||!t){alert('Выберите дату/время/пакет');return;}
+  const end=new Date(`2000-01-01T${t}:00`);
+  end.setHours(end.getHours()+state.package.arenaHours);
+  const ee=String(end.getHours()).padStart(2,'0')+':'+String(end.getMinutes()).padStart(2,'0');
+  document.getElementById('slots').innerHTML=`<div class='card active'>Слот: ${t}-${ee}</div>`;
+
+  const guests=(+document.getElementById('guests')?.value||0);
+  document.getElementById('altQuick').innerHTML=renderQuickAlt(d);
+  const dFmt=d.split('-').reverse().join('.'); const url=`/svstolviar.php?dat=${encodeURIComponent(dFmt)}&start=${encodeURIComponent(t)}&stop=${encodeURIComponent(ee)}&kol=${guests}&voz=0&zal=4&ok=2&t=${Date.now()}`;
+  fetch(url).then(r=>r.text()).then(txt=>{
+    let arr=[];
+    try{arr=JSON.parse(txt);}catch(e){arr=[];} if(arr && !Array.isArray(arr) && typeof arr==='object'){arr=Object.values(arr);} 
+    const box=document.getElementById('tables');
+    if(!Array.isArray(arr)||!arr.length){let alt=''; const base=new Date(d); let c=0; for(let dd=0;dd<14 && c<11;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){ if(c>=11)return; const weekend=(dt.getDay()==0||dt.getDay()==6); const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; const pr=pk?(weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const txt=!weekend?('Лови выгоду Цена пакета "'+(pk?pk.name:'')+'" - '+pr+' ₽'):(ds+' '+ti+' — '+pr+' ₽'); alt += '<button class=\"ghost altTime\" data-date=\"'+ds+'\" data-time=\"'+ti+'\" style=\"margin:4px;'+st+'\">'+txt+'</button>'; c++;}); } box.innerHTML=renderAltOptions(d); return;}
+    arr=arr.filter(it=>(String(it.zal)==='4'||String(it.zal).toLowerCase()==='viar') && isFreeTable(it)); if(!arr.length){let alt=''; const base=new Date(d); const options=[]; for(let dd=0;dd<14;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){options.push({ds,ti,weekend:(dt.getDay()==0||dt.getDay()==6)});});} const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; options.slice(0,11).forEach(function(o){const pr=pk?(o.weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=o.weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const promo=o.weekend?'':'<div style=\"font-size:12px;color:#9dd41a\">Лови выгоду</div>'; alt += '<button class=\"ghost altTime\" data-date=\"'+o.ds+'\" data-time=\"'+o.ti+'\" style=\"margin:4px;'+st+'\">'+o.ds+' '+o.ti+' — '+pr+' ₽'+promo+'</button>';}); box.innerHTML='<div class="card">Нет свободных столов. Измените дату/время:</div>'+alt; return;} box.innerHTML=arr.map(it=>`<div class="card" data-table="${it.id||''}">${it.kar?`<img src='${it.kar}' style='width:100%;height:120px;object-fit:cover;margin-bottom:8px'>`:''}<div><b>Зал 4 (VR Arena)</b></div><div>Стол ${it.stol||''}</div><div>Вместимость: ${it.vm||'-'}</div><div>${it.op||''}</div></div>`).join('');
+  }).catch(function(err){console.log(err); document.getElementById('tables').innerHTML=renderAltOptions(d); document.getElementById('altQuick').innerHTML=renderQuickAlt(d);});
+
+  document.querySelector('[data-step="2"]').style.display='block';
+  document.getElementById('altQuick').innerHTML=renderQuickAlt(d);
+  goStep(2);
+};
+
+document.getElementById('toStep4').onclick=()=>{document.querySelector('[data-step="4"]').style.display='block';goStep(4);upd();}
+document.getElementById('toStep6').onclick=()=>{document.querySelector('[data-step="5"]').style.display='block';goStep(5);upd();}
+function doFinish(){const main=document.querySelector('.vr-main');const panel=document.getElementById('finalPanel');const summary=document.getElementById('vrSummary');main.style.transition='opacity .4s';main.style.opacity='0';setTimeout(()=>{main.style.display='none';summary.style.float='none';summary.style.width='100%';panel.style.display='block';panel.style.opacity='0';panel.style.transition='opacity .4s';setTimeout(()=>panel.style.opacity='1',20);},350);}
+document.getElementById('finishFlow').onclick=doFinish;
+document.getElementById('finishFlowSide').onclick=doFinish;
+document.getElementById('backToForm').onclick=()=>{document.querySelector('.vr-main').style.display='block';setTimeout(()=>{document.querySelector('.vr-main').style.opacity='1';},20);document.getElementById('finalPanel').style.display='none';document.getElementById('orderWrap').style.display='none';document.getElementById('collapseOrder').style.display='none';}
+document.getElementById('getCode').onclick=()=>alert('SMS код отправлен (демо)');
+document.getElementById('sendOrder').onclick=()=>alert('Заявка отправлена!');
+
+
+
+document.addEventListener('click',function(e){
+ if(e.target.classList.contains('altTime')){ var tm=e.target.getAttribute('data-time'); var nd=e.target.getAttribute('data-date')||document.getElementById('date').value; document.getElementById('time').value=tm; document.getElementById('date').value=nd; state.selDate=nd; state.selTime=tm; renderCards('packages',PACKAGES,'package'); document.getElementById('findArena').click(); upd(); }
+ if(e.target.id==='toggleOrder'){ document.getElementById('orderWrap').style.display='block'; document.getElementById('collapseOrder').style.display='block'; }
+ if(e.target.id==='collapseOrder'){ document.getElementById('orderWrap').style.display='none'; document.getElementById('collapseOrder').style.display='none'; }
+ if(e.target.classList.contains('bookbtn')){ var card=e.target.closest('.card'); var i=card?card.dataset.i:null; if(i===null)return; var v=prompt('Время игры: 30, 60, 90 или package','package'); state.gameDur=state.gameDur||{}; state.gameDur[i]=v||'package'; }
+});
+
+
+document.addEventListener('click',function(e){
+ if(e.target.classList.contains('gameimg')){ const i=e.target.dataset.i; const g=games[i]; if(g) alert(g.name+'\n\n'+(g.desc||'Описание игры скоро добавим')); }
+ if(e.target.classList.contains('durbtn')){
+   const i=e.target.dataset.i; const val=e.target.dataset.min;
+   const packMin=(state.package?.arenaMin||0);
+   state.gameDur=state.gameDur||{};
+   const newVal=(val==='package'?packMin:parseInt(val,10)); if(state.gameDur[i]===newVal){delete state.gameDur[i]; e.target.style.outline='none'; return;} state.gameDur[i]=newVal;
+   const sum=Object.values(state.gameDur).reduce((a,b)=>a+(+b||0),0);
+   if(sum>packMin){ alert('Превышено время игры по пакету'); delete state.gameDur[i]; return; } document.getElementById('gameRemain').innerText='Остаток времени игры: '+(packMin-sum)+' мин';
+   e.target.parentElement.querySelectorAll('.durbtn').forEach(x=>x.style.outline='none'); e.target.style.outline='2px solid #fff';
+ }
+});
+
+</script>
+<?php get_footer(); ?>

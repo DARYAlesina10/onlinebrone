@@ -896,6 +896,22 @@ get_header();
     });
   </script>
   <script src="<?php bloginfo('template_directory'); ?>/js/jquery.min.js"></script>
+
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap");
+body{font-family:Montserrat,Helvetica,Arial,sans-serif;background:#f5f7fb}
+.container-xl{max-width:1240px}
+.footer__inner.vz{background:#fff;border:1px solid #dce6f2;border-radius:22px;padding:20px 16px;margin-bottom:20px;box-shadow:0 12px 30px rgba(16,56,88,.08)}
+.main__title.quest-selection-page__title{font-weight:800;color:#1d2f45;text-transform:uppercase;letter-spacing:.4px}
+.booking-popup__legend{background:#f2f7ff;border:1px solid #dbe8ff;padding:12px 14px;border-radius:14px;color:#48627e}
+.vramecko{border-radius:16px!important;box-shadow:0 8px 22px rgba(0,0,0,.1)}
+.animated-button.button,.button.button--orange,.vbnr{border-radius:14px!important;background:#a4d013!important;border-color:#a4d013!important;color:#fff!important;font-weight:700}
+.animated-button.button:hover,.button.button--orange:hover,.vbnr:hover{background:#8db61b!important;border-color:#8db61b!important}
+.nav-pills .nav-link{background:#e9f0db;color:#3d4f1a;border-radius:12px}
+.nav-pills .nav-link.active,.nav-pills .show>.nav-link{background:#ffbd3c;color:#fff}
+.vibmn{background:#eff9e8;border:1px solid #d6efc6;padding:10px;border-radius:12px}
+#iton .table{background:#fff;border-radius:12px;overflow:hidden}
+</style>
 <script src="https://pandoroom.org/wp-content/themes/pandoroom/js/jquery.maskedinput.min.js"></script>
 <script defer src="<?php bloginfo('template_directory'); ?>/scriptsz/scriptviar.js?v=<?php echo time(); ?>"></script>
   <script  src="<?php bloginfo('template_directory'); ?>/jss/standart.js"></script>
