@@ -110,10 +110,12 @@ document.getElementById('toStep3').onclick=()=>{document.querySelector('[data-st
 
 function isFreeTable(it){
   if(it==null || typeof it!=='object') return false;
-  if('free' in it) return String(it.free)==='1' || it.free===true;
-  if('isFree' in it) return !!it.isFree;
-  if('busy' in it) return !(it.busy===true || String(it.busy)==='1');
-  if('reserved' in it) return !(it.reserved===true || String(it.reserved)==='1');
+  const hasStatus=('free' in it)||('isFree' in it)||('busy' in it)||('reserved' in it);
+  if(!hasStatus) return true;
+  if('free' in it) return String(it.free)==='1' || it.free===true || String(it.free).toLowerCase()==='true';
+  if('isFree' in it) return it.isFree===true || String(it.isFree).toLowerCase()==='true';
+  if('busy' in it) return !(it.busy===true || String(it.busy)==='1' || String(it.busy).toLowerCase()==='true');
+  if('reserved' in it) return !(it.reserved===true || String(it.reserved)==='1' || String(it.reserved).toLowerCase()==='true');
   return true;
 }
 function renderQuickAlt(d){
@@ -142,6 +144,7 @@ document.getElementById('findArena').onclick=()=>{
   document.getElementById('slots').innerHTML=`<div class='card active'>Слот: ${t}-${ee}</div>`;
 
   const guests=(+document.getElementById('guests')?.value||0);
+  document.getElementById('altQuick').innerHTML=renderQuickAlt(d);
   const dFmt=d.split('-').reverse().join('.'); const url=`/svstolviar.php?dat=${encodeURIComponent(dFmt)}&start=${encodeURIComponent(t)}&stop=${encodeURIComponent(ee)}&kol=${guests}&voz=0&zal=4&ok=2&t=${Date.now()}`;
   fetch(url).then(r=>r.text()).then(txt=>{
     let arr=[];
@@ -149,7 +152,7 @@ document.getElementById('findArena').onclick=()=>{
     const box=document.getElementById('tables');
     if(!Array.isArray(arr)||!arr.length){let alt=''; const base=new Date(d); let c=0; for(let dd=0;dd<14 && c<11;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){ if(c>=11)return; const weekend=(dt.getDay()==0||dt.getDay()==6); const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; const pr=pk?(weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const txt=!weekend?('Лови выгоду Цена пакета "'+(pk?pk.name:'')+'" - '+pr+' ₽'):(ds+' '+ti+' — '+pr+' ₽'); alt += '<button class=\"ghost altTime\" data-date=\"'+ds+'\" data-time=\"'+ti+'\" style=\"margin:4px;'+st+'\">'+txt+'</button>'; c++;}); } box.innerHTML=renderAltOptions(d); return;}
     arr=arr.filter(it=>(String(it.zal)==='4'||String(it.zal).toLowerCase()==='viar') && isFreeTable(it)); if(!arr.length){let alt=''; const base=new Date(d); const options=[]; for(let dd=0;dd<14;dd++){const dt=new Date(base); dt.setDate(base.getDate()+dd); const ds=dt.toISOString().slice(0,10); ['10:00','12:00','14:00','16:00','18:00'].forEach(function(ti){options.push({ds,ti,weekend:(dt.getDay()==0||dt.getDay()==6)});});} const tIdx=tier(+document.getElementById('guests').value||8); const pk=state.package; options.slice(0,11).forEach(function(o){const pr=pk?(o.weekend?pk.prices.we[tIdx]:pk.prices.wd[tIdx]):0; const st=o.weekend?'background:#2b2f3a':'background:#244425;box-shadow:0 0 10px #99c31c'; const promo=o.weekend?'':'<div style=\"font-size:12px;color:#9dd41a\">Лови выгоду</div>'; alt += '<button class=\"ghost altTime\" data-date=\"'+o.ds+'\" data-time=\"'+o.ti+'\" style=\"margin:4px;'+st+'\">'+o.ds+' '+o.ti+' — '+pr+' ₽'+promo+'</button>';}); box.innerHTML='<div class="card">Нет свободных столов. Измените дату/время:</div>'+alt; return;} box.innerHTML=arr.map(it=>`<div class="card" data-table="${it.id||''}">${it.kar?`<img src='${it.kar}' style='width:100%;height:120px;object-fit:cover;margin-bottom:8px'>`:''}<div><b>Зал 4 (VR Arena)</b></div><div>Стол ${it.stol||''}</div><div>Вместимость: ${it.vm||'-'}</div><div>${it.op||''}</div></div>`).join('');
-  }).catch(function(){document.getElementById('tables').innerHTML=renderAltOptions(d); document.getElementById('altQuick').innerHTML=renderQuickAlt(d);});
+  }).catch(function(err){console.log(err); document.getElementById('tables').innerHTML=renderAltOptions(d); document.getElementById('altQuick').innerHTML=renderQuickAlt(d);});
 
   document.querySelector('[data-step="2"]').style.display='block';
   document.getElementById('altQuick').innerHTML=renderQuickAlt(d);
